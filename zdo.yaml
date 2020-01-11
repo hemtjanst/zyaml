@@ -1,4 +1,3 @@
----
 manufacturer: &manufacturer
   0x100B: Philips
   0x1021: Legrand

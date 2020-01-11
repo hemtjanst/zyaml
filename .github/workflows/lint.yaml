@@ -13,4 +13,4 @@ jobs:
     - name: Install YAMLlint
       run: pip install yamllint 
     - name: Run the linter
-      run: yamllint -c ./.yamllint.yaml *.yaml **/*.yaml
+      run: yamllint --strict -c ./.yamllint.yaml *.yaml **/*.yaml
