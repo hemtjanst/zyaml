@@ -17,6 +17,36 @@ implementation.
 The specification can be retrieved from the Zigbee Alliance
 [Developer portal](https://zigbeealliance.org/developer_resources/?file_type%5B%5D=specification)
 
+## Reserved names
+
+These names are reserved for functions related to attributes and commands, 
+they should not be used as a attribute/argument names:
+
+* AddValues
+* Arguments
+* ArrayTypeID
+* ArrayValues
+* Cluster
+* Description
+* Direction
+* Handle
+* ID
+* MarshalZcl
+* MnfCode
+* Name
+* Readable
+* Reportable
+* Required
+* SceneIndex
+* SetValue
+* SetValues
+* String
+* TypeID
+* UnmarshalZcl
+* Value
+* Values
+* Writable
+
 ## Attribution
 
 A number of definitions were originally sourced from Dresden Elektronik's

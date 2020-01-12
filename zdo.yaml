@@ -727,6 +727,7 @@ commands:
 
   - name: Active Endpoint Request
     id: "0x0005"
+    response: "0x8005"
     required: true
     description: |
       queries the remote device for a list of active endpoints. Should be unicast to the remote device directly,
