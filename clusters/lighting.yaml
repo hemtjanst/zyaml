@@ -122,8 +122,8 @@ types:
     unit: Seconds
     range: 0x0000,0xfffe
     multiplier: 10
-  Direction: &direction
-    name: Direction
+  MoveDirection: &moveDirection
+    name: Move Direction
     type: enum8
     values:
       "0x00": Shortest distance
@@ -798,7 +798,7 @@ clusters:
           dir: recv
           payloadattr:
             - *hue
-            - *direction
+            - *moveDirection
             - *transitionTime
         - id: "0x01"
           name: Move hue
@@ -872,7 +872,7 @@ clusters:
           required: true
           payloadattr:
             - *enhancedHue
-            - *direction
+            - *moveDirection
             - *transitionTime
         - id: "0x41"
           name: Enhanced move hue
