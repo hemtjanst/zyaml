@@ -1,4 +1,5 @@
 ---
+name: Lighting
 templates:
   ColorPointX: &colorPointX
     description: |

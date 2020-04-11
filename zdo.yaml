@@ -6,6 +6,7 @@ manufacturer: &manufacturer
   0x117C: Ikea
   0x115F: Xiaomi
   0x1037: NXP
+  0x1166: innr
 
 templates:
   condSuccess: &__cond_success
@@ -89,6 +90,9 @@ types:
     name: Profile ID
     showas: hex
     type: u16
+    values:
+      0x0104: Home Automation
+      0xC05E: Light Link
   clusterId: &clusterId
     name: Cluster ID
     showas: hex
@@ -364,6 +368,8 @@ types:
   lqi: &lqi
     name: Lqi
     type: u8
+    unit: Percent
+    multiplier: 2.55
     description: is the estimated link quality for RF transmissions from this device
 
   totalEntries: &totalEntries
@@ -371,17 +377,9 @@ types:
     description: is the total number of entries that can be queried for
     type: u8
 
-  neighborTable: &neighborTable
-    name: Neighbor Table
-    description:
-    type: array
-    arraytype: _NeighborTableEntry
-
   neighborTableEntry:
     name: Neighbor Table Entry
-    .tpl: &neighborTableEntry
-      name: Neighbor Table Entry
-      type: _NeighborTableEntry
+    _ref: &neighborTableEntry "_NeighborTableEntry"
     type: local
     structattr:
       - <<: *ieee
@@ -391,33 +389,65 @@ types:
       - <<: *neighborType
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.NeighborType = NeighborType((b[0] >> 6) & 0x03)
+          v.NeighborType = NeighborType((b[0] >> 6) & 0x03)
         marshal: |
           tmp = []byte{}
-          tmp2 = uint32(a.NeighborType & 0x03) << 6
+          tmp2 = uint32(v.NeighborType & 0x03) << 6
       - <<: *rxOnWhenIdle
         unmarshal: |
-          a.RxOnWhenIdle = RxOnWhenIdle((b[0] >> 4) & 0x03)
+          v.RxOnWhenIdle = RxOnWhenIdle((b[0] >> 4) & 0x03)
         marshal: |
-          tmp2 |= uint32(a.RxOnWhenIdle & 0x03) << 4
+          tmp2 |= uint32(v.RxOnWhenIdle & 0x03) << 4
       - <<: *relationship
         unmarshal: |
-          a.Relationship = Relationship((b[0] >> 1) & 0x07)
+          v.Relationship = Relationship((b[0] >> 1) & 0x07)
           b = b[1:]
         marshal: |
-          tmp2 |= uint32(a.Relationship & 0x07) << 1
+          tmp2 |= uint32(v.Relationship & 0x07) << 1
           tmp = []byte{uint8(tmp2)}
       - <<: *permitJoining
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.PermitJoining = PermitJoining((b[0] >> 6) & 0x03)
+          v.PermitJoining = PermitJoining((b[0] >> 6) & 0x03)
           b = b[1:]
         marshal: |
-          tmp2 = uint32(a.PermitJoining & 0x03) << 6
+          tmp2 = uint32(v.PermitJoining & 0x03) << 6
           tmp = []byte{uint8(tmp2)}
       - *depth
       - *lqi
 
+  neighborTable: &neighborTable
+    name: Neighbor Table
+    description:
+    type: array
+    arraytype: *neighborTableEntry
+
+
+  bindingTableEntry:
+    name: Binding Table Entry
+    _ref: &bindingTableEntry
+      name: Binding Table Entry
+      type: &bindingTableEntryType "_BindingTableEntry"
+    type: local
+    structattr:
+      - *sourceAddress
+      - *sourceEndpoint
+      - *clusterId
+      - *addressMode
+      - <<: *nwk
+        cond:
+          - *__cond_addr_short
+      - <<: *ieee
+        cond:
+          - *__cond_addr_long
+      - <<: *endpoint
+        cond:
+          - *__cond_addr_not_group
+
+  bindingTable: &bindingTable
+    name: Binding Table
+    type: array
+    arraytype: *bindingTableEntryType
 
   complexDescriptor: &complexDescriptor
     name: Complex Descriptor
@@ -433,32 +463,32 @@ types:
       - <<: *npMode
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.PowerMode[0] = (b[0] >> 4) & 0x0F
+          v.PowerMode[0] = b[0] & 0x0F
         marshal: |
           tmp = []byte{}
-          tmp2 = uint32(a.PowerMode[0] & 0x0F) << 4
+          tmp2 = uint32(v.PowerMode[0] & 0x0F)
       - <<: *npSource
         argname: Active Power Source
         unmarshal: |
-          a.ActivePowerSource[0] = b[0] & 0x0F
+          v.ActivePowerSource[0] = (b[0] >> 4) & 0x0F
           b = b[1:]
         marshal: |
-          tmp2 |= uint32(a.ActivePowerSource[0] & 0x0F)
+          tmp2 |= uint32(v.ActivePowerSource[0] & 0x0F) << 4
           tmp = []byte{uint8(tmp2)}
       - <<: *npSource
         argname: Current Power Source
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.CurrentPowerSource[0] = (b[0] >> 4) & 0x0F
+          v.CurrentPowerSource[0] = b[0] & 0x0F
         marshal: |
           tmp = []byte{}
-          tmp2 = uint32(a.CurrentPowerSource[0] & 0x0F) << 4
+          tmp2 = uint32(v.CurrentPowerSource[0] & 0x0F)
       - <<: *npLevel
         unmarshal: |
-          a.PowerLevel = PowerLevel(b[0] & 0x0F)
+          v.PowerLevel = PowerLevel(b[0] >> 4) & 0x0F
           b = b[1:]
         marshal: |
-          tmp2 |= uint32(a.PowerLevel & 0x0F)
+          tmp2 |= uint32(v.PowerLevel & 0x0F) << 4
           tmp = []byte{uint8(tmp2)}
 
   logicalType: &logicalType
@@ -488,6 +518,7 @@ types:
       0: "868 MHz"
       2: "902-928 MHz"
       3: "2.4 GHz"
+      4: "EU Sub-GHz"
       # 0: "868.0-868.6 MHz"
       # 2: "902.0-928 MHz"
       # 3: "2400.0-2483.5 MHz"
@@ -534,35 +565,35 @@ types:
       - <<: *logicalType
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.LogicalType = LogicalType((b[0] >> 5) & 0x07)
+          v.LogicalType = LogicalType(b[0] & 0x07)
         marshal: |
           tmp = []byte{}
-          tmp2 = uint32(a.LogicalType & 0x07) << 5
+          tmp2 = uint32(v.LogicalType & 0x07)
       - <<: *complexDescriptorAvailable
         unmarshal: |
-          a.ComplexDescriptorAvailable = ComplexDescriptorAvailable((b[0] >> 4) & 0x01)
+          v.ComplexDescriptorAvailable = ComplexDescriptorAvailable((b[0] >> 3) & 0x01)
         marshal: |
-          tmp2 |= uint32(a.ComplexDescriptorAvailable & 0x01) << 4
+          tmp2 |= uint32(v.ComplexDescriptorAvailable & 0x01) << 3
       - <<: *userDescriptorAvailable
         unmarshal: |
-          a.UserDescriptorAvailable = UserDescriptorAvailable((b[0] >> 3) & 0x01)
+          v.UserDescriptorAvailable = UserDescriptorAvailable((b[0] >> 4) & 0x01)
           b = b[1:]
         marshal: |
-          tmp2 |= uint32(a.UserDescriptorAvailable & 0x01) << 3
+          tmp2 |= uint32(v.UserDescriptorAvailable & 0x01) << 4
           tmp = []byte{uint8(tmp2)}
       - <<: *apsFlags
         unmarshal: |
           if len(b) == 0 { return b, zcl.ErrNotEnoughData }
-          a.ApsFlags = ApsFlags((b[0] >> 5) & 0x07)
+          v.ApsFlags = ApsFlags(b[0] & 0x07)
         marshal: |
           tmp = []byte{}
-          tmp2 = uint32(a.ApsFlags & 0x07) << 5
+          tmp2 = uint32(v.ApsFlags & 0x07)
       - <<: *frequencyBands
         unmarshal: |
-          a.FrequencyBands[0] = b[0] & 0x1F
+          v.FrequencyBands[0] = (b[0] >> 3) & 0x1F
           b = b[1:]
         marshal: |
-          tmp2 |= uint32(a.FrequencyBands[0] & 0x1F)
+          tmp2 |= uint32(v.FrequencyBands[0] & 0x1F) << 3
           tmp = []byte{uint8(tmp2)}
       - <<: *macCapabilityFlags
       - <<: *mnfCode
@@ -762,6 +793,9 @@ commands:
     id: "0x8006"
     payloadattr:
       - *status
+      - <<: *nwk
+        cond:
+          - *__cond_success
       - <<: *endpointList
         cond:
           - *__cond_success
@@ -982,41 +1016,31 @@ commands:
 
   - name: Bind Request
     id: "0x0021"
+    response: "0x8033"
     payloadattr:
-      - *sourceAddress
-      - *sourceEndpoint
-      - *clusterId
-      - *addressMode
-      - <<: *nwk
-        cond:
-          - *__cond_addr_short
-      - <<: *ieee
-        cond:
-          - *__cond_addr_long
-      - <<: *endpoint
-        cond:
-          - *__cond_addr_not_group
+      - *bindingTableEntry
   - name: Bind Response
     id: "0x8021"
     payloadattr:
       - *status
 
+  - name: Mgmt Bind Request
+    id: "0x0033"
+    response: "0x8033"
+    payloadattr:
+      - *startIndex
+  - name: Mgmt Bind Response
+    id: "0x8033"
+    payloadattr:
+      - *status
+      - *totalEntries
+      - *startIndex
+      - *bindingTable
+
   - name: Unbind Request
     id: "0x0022"
     payloadattr:
-      - *sourceAddress
-      - *sourceEndpoint
-      - *clusterId
-      - *addressMode
-      - <<: *nwk
-        cond:
-          - *__cond_addr_short
-      - <<: *ieee
-        cond:
-          - *__cond_addr_long
-      - <<: *endpoint
-        cond:
-          - *__cond_addr_not_group
+      - *bindingTableEntry
   - name: Unbind Response
     id: "0x8022"
     payloadattr:
