@@ -1,0 +1,472 @@
+---
+name: Measurement and sensing
+description: |
+  provides generic measurement and sensing interfaces
+
+types:
+  MeasuredIlluminance: &measuredIlluminance
+    id: "0x0000"
+    name: Measured Illuminance
+    description: |
+      represents the Illuminance in Lux (symbol lx) as follows
+      MeasuredValue = 10,000 x log10 Flow + 1 where 1 lx
+      <= Flow <=3.576 Mlx, corresponding to a MeasuredValue
+      in the range 1 to 0xfffe
+    type: u16
+    access: r
+    report: true
+    required: true
+    default: "0x0000"
+    range: 0x0000,0xffff
+    unit: Luxes
+  MinMeasuredIlluminance: &minMeasuredIlluminance
+    id: "0x0001"
+    name: Min Measured Illuminance
+    description: |
+      indicates the minimum value of MeasuredIlluminance that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0001,0xfffd
+    unit: Luxes
+  MaxMeasuredIlluminance: &maxMeasuredIlluminance
+    id: "0x0002"
+    name: Max Measured Illuminance
+    description: |
+      indicates the maximum value of MeasuredIlluminance that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0002,0xfffe
+    unit: Luxes
+  Tolerance: &tolerance
+    id: "0x0003"
+    name: Tolerance
+    description: |
+      indicates the magnitude of the possible error that is associated with MeasuredValue.
+      The true value is located in the range (MeasuredValue – Tolerance) to
+      (MeasuredValue + Tolerance)
+    type: u16
+    access: r
+    report: true
+    range: 0x0000,0x0800
+  LightSensorType: &lightSensorType
+    id: "0x0004"
+    name: Light Sensor Type
+    description: |
+      specifies the electronic type of the light sensor. The range 0x40-0xfe is reserved for
+      manufacturer specific light sensor types
+    type: enum8
+    access: r
+    range: 0x00,0xff
+    default: "0xff"
+    values:
+      0x00: Photodiode
+      0x01: CMOS
+      0xff: Unknown
+  LevelStatus: &levelStatus
+    id: "0x0000"
+    name: Level Status
+    description: |
+      indicates whether the measured Flow is above, below, or within a band
+      around FlowTargetLevel
+    type: enum8
+    access: r
+    report: true
+    required: true
+    range: 0x00,0xfe
+    values:
+      0x00: Flow on target
+      0x01: Flow below target
+      0x03: Flow above target
+  IlluminanceLightSensorType: &illuminanceLightSensorType
+    <<: *lightSensorType
+    id: "0x0001"
+    name: Illuminance Light Sensor Type
+  IlluminanceTargetLevel: &illuminanceTargetLevel
+    id: "0x0010"
+    name: Illuminance Target Level
+    description: |
+      specifies the target Illuminance level. This target level is taken as the
+      centre of a 'dead band', which must be sufficient in width, with hysteresis
+      bands at both top and bottom, to provide reliable notifications without
+      'chatter'. IlluminanceTargetLevel represents Illuminance in Lux (symbol lx) as
+      follows: IlluminanceTargetLevel = 10,000 x log 10 Illuminance
+    type: u16
+    range: 0x0000,0xfffe
+    access: rw
+    required: true
+    unit: Luxes
+  MeasuredTemperature: &measuredTemperature
+    id: "0x0000"
+    name: Measured Temperature
+    description: |
+      represents the temperature in degrees DegreesCelsius
+    type: s16
+    access: r
+    report: true
+    required: true
+    default: "0"
+    range: 0x954d,0x7fff
+    unit: DegreesCelsius
+    multiplier: 100
+  MinMeasuredTemperature: &minMeasuredTemperature
+    id: "0x0001"
+    name: Min Measured Temperature
+    description: |
+      indicates the minimum value of MeasuredTemperature that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    required: true
+    range: 0x954d,0x7ffe
+    unit: DegreesCelsius
+    multiplier: 100
+  MaxMeasuredTemperature: &maxMeasuredTemperature
+    id: "0x0002"
+    name: Max Measured Temperature
+    description: |
+      indicates the maximum value of MeasuredTemperature that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    required: true
+    range: 0x954e,0x7fff
+    unit: DegreesCelsius
+    multiplier: 100
+  MeasuredPressure: &measuredPressure
+    id: "0x0000"
+    name: Measured Pressure
+    description: |
+      represents the temperature in degrees DegreesCelsius
+    type: s16
+    access: r
+    report: true
+    required: true
+    default: "0"
+    range: 0x8001,0x7fff
+    unit: Kilopascals
+    multiplier: 10
+  MinMeasuredPressure: &minMeasuredPressure
+    id: "0x0001"
+    name: Min Measured Pressure
+    description: |
+      indicates the minimum value of MeasuredPressure that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    required: true
+    range: 0x8001,0x7ffe
+    unit: Kilopascals
+    multiplier: 10
+  MaxMeasuredPressure: &maxMeasuredPressure
+    id: "0x0002"
+    name: Max Measured Pressure
+    description: |
+      indicates the maximum value of MeasuredPressure that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    required: true
+    range: 0x8002,0x7fff
+    unit: Kilopascals
+    multiplier: 10
+  ScaledPressure: &scaledPressure
+    id: "0x0010"
+    name: Scaled Pressure
+    description: |
+      represents the pressure in Pascals as follows:
+      ScaledPressure = 10^Scale x Pressure in Pa
+    type: s16
+    access: r
+    report: true
+    default: "0"
+    range: 0x8001,0x7fff
+    unit: Pascals
+  ScaledMinPressure: &scaledMinPressure
+    id: "0x0011"
+    name: Scaled Min Pressure
+    description: |
+      indicates the minimum value of ScaledPressure that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    range: 0x8001,0x7ffe
+    unit: Pascals
+  ScaledMaxPressure: &scaledMaxPressure
+    id: "0x0012"
+    name: Scaled Max Pressure
+    description: |
+      indicates the maximum value of ScaledPressure that can be measured. A
+      value of 0x8000 indicates that this attribute is not defined
+    type: s16
+    access: r
+    range: 0x8002,0x7fff
+    unit: Pascals
+  ScaledTolerance: &scaledTolerance
+    id: "0x0013"
+    name: Scaled Tolerance
+    description: |
+      indicates the magnitude of the possible error that is associated with ScaledPressure.
+      The true value is located in the range (ScaledPressure – ScaledTolerance) to
+      (ScaledPressure + ScaledTolerance)
+    type: u16
+    access: r
+    report: true
+    range: 0x0000,0x0800
+  Scale: &scale
+    id: "0x0014"
+    name: Scale
+    description: |
+      indicates the base 10 exponent used to obtain ScaledPressure
+    type: s8
+    access: r
+    range: 0x81,0x7f
+  MeasuredFlow: &measuredFlow
+    id: "0x0000"
+    name: Measured Flow
+    description: |
+      represents the flow in m^3/h
+    type: u16
+    access: r
+    report: true
+    required: true
+    default: "0"
+    range: 0x0000,0xfffe
+    unit: CubicMetersPerHour
+    multiplier: 10
+  MinMeasuredFlow: &minMeasuredFlow
+    id: "0x0001"
+    name: Min Measured Flow
+    description: |
+      indicates the minimum value of MeasuredFlow that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0000,0xfffd
+    unit: CubicMetersPerHour
+    multiplier: 10
+  MaxMeasuredFlow: &maxMeasuredFlow
+    id: "0x0002"
+    name: Max Measured Flow
+    description: |
+      indicates the maximum value of MeasuredFlow that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0001,0xfffe
+    unit: CubicMetersPerHour
+    multiplier: 10
+  MeasuredRelativeHumidity: &measuredRH
+    id: "0x0000"
+    name: Measured Relative Humidity
+    description: |
+      represents the relative humidity in percent
+    type: u16
+    access: r
+    report: true
+    required: true
+    range: 0x0000,0x2710
+    unit: PercentRelativeHumidity
+    multiplier: 100
+  MinMeasuredRelativeHumidity: &minMeasuredRH
+    id: "0x0001"
+    name: Min Measured Relative Humidity
+    description: |
+      indicates the minimum value of MeasuredRH that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0000,0x270f
+    unit: PercentRelativeHumidity
+    multiplier: 100
+  MaxMeasuredRelativeHumidity: &maxMeasuredRH
+    id: "0x0002"
+    name: Max Measured Relative Humidity
+    description: |
+      indicates the maximum value of MeasuredRH that can be measured. A
+      value of 0xffff indicates that this attribute is not defined
+    type: u16
+    access: r
+    required: true
+    range: 0x0001,0x2710
+    unit: PercentRelativeHumidity
+    multiplier: 100
+  Occupancy: &occupancy
+    id: "0x0000"
+    name: Occupancy
+    type: bmp8
+    access: r
+    report: true
+    required: true
+    bits:
+      "0": Occupied
+  OccupancyType: &occupancyType
+    id: "0x0001"
+    name: Occupancy Type
+    type: enum8
+    access: r
+    range: 0x00,0xfe
+    required: true
+    values:
+      0x00: PIR
+      0x01: Ultrasonic
+      0x03: PIR and ultrasonic
+  PirOccupiedToUnoccupiedDelay: &pirOccupiedToUnoccupiedDelay
+    id: "0x0010"
+    name: PIR Occupied To Unoccupied Delay
+    description: |
+      is 16 bits in length and specifies the time delay, in seconds, before the PIR sensor
+      changes to its unoccupied state after the last detection of movement in the sensed area
+    type: u16
+    access: rw
+    range: 0x00,0xfffe
+    default: "0x00"
+  PirUnoccupiedToOccupiedDelay: &pirUnoccupiedToOccupiedDelay
+    id: "0x0011"
+    name: PIR Unoccupied To Occupied Delay
+    description: |
+      is 16 bits in length and specifies the time delay, in seconds, before the PIR sensor changes
+      to its occupied state after the detection of movement in the sensed area. This attribute is
+      mandatory if the PIRUnoccupiedToOccupiedThreshold attribute is implemented
+    type: u16
+    access: rw
+    range: 0x00,0xfffe
+    default: "0x00"
+  PirUnoccupiedToOccupiedThreshold: &pirUnoccupiedToOccupiedThreshold
+    id: "0x0012"
+    name: PIR Unoccupied To Occupied Threshold
+    description:
+      is 8 bits in length and specifies the number of movement detection events that must occur in the
+      period PIRUnoccupiedToOccupiedDelay, before the PIR sensor changes to its occupied state. This
+      attribute is mandatory if the PIRUnoccupiedToOccupiedDelay attribute is implemented
+    type: u8
+    access: rw
+    range: 0x01,0xfe
+    default: "0x01"
+  UltrasonicOccupiedToUnoccupiedDelay: &ultrasonicOccupiedToUnoccupiedDelay
+    id: "0x0020"
+    name: Ultrasonic Occupied To Unoccupied Delay
+    description: |
+      is 16 bits in length and specifies the time delay, in seconds, before the Ultrasonic sensor
+      changes to its unoccupied state after the last detection of movement in the sensed area
+    type: u16
+    access: rw
+    range: 0x00,0xfffe
+    default: "0x00"
+  UltrasonicUnoccupiedToOccupiedDelay: &ultrasonicUnoccupiedToOccupiedDelay
+    id: "0x0021"
+    name: Ultrasonic Unoccupied To Occupied Delay
+    description: |
+      is 16 bits in length and specifies the time delay, in seconds, before the Ultrasonic sensor changes
+      to its occupied state after the detection of movement in the sensed area. This attribute is
+      mandatory if the UltrasonicUnoccupiedToOccupiedThreshold attribute is implemented
+    type: u16
+    access: rw
+    range: 0x00,0xfffe
+    default: "0x00"
+  UltrasonicUnoccupiedToOccupiedThreshold: &ultrasonicUnoccupiedToOccupiedThreshold
+    id: "0x0022"
+    name: Ultrasonic Unoccupied To Occupied Threshold
+    description:
+      is 8 bits in length and specifies the number of movement detection events that must occur in the
+      period UltrasonicUnoccupiedToOccupiedDelay, before the Ultrasonic sensor changes to its occupied
+      state. This attribute is mandatory if the UltrasonicUnoccupiedToOccupiedDelay attribute is implemented
+    type: u8
+    access: rw
+    range: 0x01,0xfe
+    default: "0x01"
+
+clusters:
+  - id: "0x0400"
+    name: Illuminance measurement
+    description: |
+      provides attributes and commands for configuring the measurement of
+      Illuminance, and reporting Illumince measurements
+    server:
+      attr:
+        - *measuredIlluminance
+        - *minMeasuredIlluminance
+        - *maxMeasuredIlluminance
+        - *tolerance
+        - *lightSensorType
+  - id: "0x0401"
+    name: Illuminance level sensing
+    description: |
+      provides attributes and commands for configuring the sensing of
+      Illuminance levels, and reporting whether Illuminance is above, below,
+      or on target
+    server:
+      attr:
+        - *levelStatus
+        - *illuminanceLightSensorType
+        - *illuminanceTargetLevel
+  - id: "0x0402"
+    name: Temperature measurement
+    description: |
+      provides attributes and commands for configuring the measurement of
+      temperature, and reporting temperature measurements
+    server:
+      attr:
+        - *measuredTemperature
+        - *minMeasuredTemperature
+        - *maxMeasuredTemperature
+        - *tolerance
+  - id: "0x0403"
+    name: Pressure measurement
+    description: |
+      provides attributes and commands for configuring the measurement of pressure,
+      and reporting pressure measurements
+    server:
+      attr:
+        - *measuredPressure
+        - *minMeasuredPressure
+        - *maxMeasuredPressure
+        - *tolerance
+        - *scaledPressure
+        - *scaledMinPressure
+        - *scaledMaxPressure
+        - *scaledTolerance
+        - *scale
+  - id: "0x0404"
+    name: Flow measurement
+    description: |
+      provides attributes and commands for configuring the measurement of flow,
+      and reporting flow rates
+    server:
+      attr:
+        - *measuredFlow
+        - *minMeasuredFlow
+        - *maxMeasuredFlow
+        - *tolerance
+  - id: "0x0405"
+    name: Relative Humidity measurement
+    description: |
+      provides attributes and commands for configuring the measurement of
+      relative humidity, and reporting relative humidity measurement
+    server:
+      attr:
+        - *measuredRH
+        - *minMeasuredRH
+        - *maxMeasuredRH
+        - *tolerance
+  - id: "0x0406"
+    name: Occupancy sensing
+    description: |
+      provides attributes and commands for configuring occupancy sensing, and
+      reporting occupancy status
+    server:
+      attr:
+        - *occupancy
+        - *occupancyType
+        - *pirOccupiedToUnoccupiedDelay
+        - *pirUnoccupiedToOccupiedDelay
+        - *pirUnoccupiedToOccupiedThreshold
+        - *ultrasonicOccupiedToUnoccupiedDelay
+        - *ultrasonicUnoccupiedToOccupiedDelay
+        - *ultrasonicUnoccupiedToOccupiedThreshold
