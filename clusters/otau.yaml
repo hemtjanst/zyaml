@@ -1,0 +1,283 @@
+---
+name: OTAU
+types:
+  UpgradeServer: &upgradeServer
+    id: "0x0000"
+    name: Upgrade server
+    type: uid
+    access: rw
+    default: "0"
+    required: true
+  FileOffset: &fileOffset
+    id: "0x0001"
+    name: File Offset
+    type: u32
+    access: r
+    default: "0xffffffff"
+    showas: hex
+  CurrentFileVersion: &currentFileVersion
+    id: "0x0002"
+    name: Current File Version
+    type: u32
+    access: r
+    default: "0xffffffff"
+    showas: hex
+  CurrentStackVersion: &currentStackVersion
+    id: "0x0003"
+    name: Current Stack Version
+    type: u16
+    access: r
+    default: "0xffff"
+    showas: hex
+  DownloadedFileVersion: &downloadedFileVersion
+    id: "0x0004"
+    name: Downloaded File Version
+    type: u32
+    access: r
+    default: "0xffffffff"
+    showas: hex
+  DownloadedStackVersion: &downloadedStackVersion
+    id: "0x0005"
+    name: Downloaded Stack Version
+    type: u16
+    access: r
+    default: "0xffff"
+    showas: hex
+  ImageUpgradeStatus: &imageUpgradeStatus
+    id: "0x0006"
+    name: Image upgrade status
+    type: enum8
+    access: rw
+    default: "0x04"
+    required: true
+    values:
+      "0x00": Normal
+      "0x01": Download in progress
+      "0x02": Download complete
+      "0x03": Waiting to upgrade
+      "0x04": Count down
+      "0x05": Wait for more
+  MinBlockRequestDelay: &minBlockRequestDelay
+    id: "0x0009"
+    name: Min block request delay
+    type: u16
+    access: r
+    default: "0"
+    required: true
+
+
+  HardwareVersionPresent: &hardwareVersionPresent
+    .tpl_hardware_version: &__cond_hardware_version_present
+      name: Hardware Version Present
+      value: "0x01"
+    name: Hardware Version Present
+    type: bool
+    required: true
+  BlockRequestOptions: &blockRequestOptions
+    name: Block Request Options
+    type: bmp8
+    required: true
+    bits:
+      "1": Request Node Address
+      "2": Minimum Block Period
+  ManufacturerCode: &manufacturerCode
+    name: Manufacturer Code
+    type: enum16
+    required: true
+    showas: hex
+  ImageType: &imageType
+    name: Image type
+    type: enum16
+    values:
+      "0x0000": Specific image
+      "0xFFC0": Security credential
+      "0xFFC1": Configuration
+      "0xFFC2": Log
+      "0xFFFF": Wild card
+  ApplicationRelease: &applicationRelease
+    name: Application Release
+    type: u8
+    showas: hex
+  ApplicationBuild: &applicationBuild
+    name: Application Build
+    type: u8
+    showas: hex
+  StackRelease: &stackRelease
+    name: Stack Release
+    type: u8
+    showas: hex
+  StackBuild: &stackBuild
+    name: Stack Build
+    type: u8
+    showas: hex
+
+  NextImageStatus: &nextImageStatus
+    name: Next Image Status
+    type: enum8
+    values:
+      "0x00": "Success"
+      "0x98": "No updates"
+
+  DataSize: &dataSize
+    name: Data Size
+    type: u8
+
+  Payload: &payload
+    name: Payload
+    type: ostring
+
+  Status: &status
+    name: Status
+    type: enum8
+    values:
+      "0x00": Success
+      "0x97": Wait for data
+    .tpl_success: &__cond_success
+      name: Status
+      value: "0x00"
+      description: "successful"
+    .tpl_wait_for_data: &__cond_wait_for_data
+      name: Status
+      value: 0x97
+      description: "wait for data status"
+  CurrentTime: &currentTime
+    name: Current Time
+    type: time
+  RequestTime: &requestTime
+    name: Request Time
+    type: time
+
+  ImageSize: &imageSize
+    name: Image Size
+    unit: Bytes
+    type: u32
+
+  HardwareVersion: &hardwareVersion
+    name: Hardware Version
+    type: u16
+
+
+clusters:
+  - id: "0x0019"
+    name: OTAU
+    description: Over the air upgrade.
+    server:
+      cmd:
+        - id: "0x01"
+          name: Query next image
+          response: "0x02"
+          dir: send
+          required: m
+          payloadattr:
+            - *hardwareVersionPresent
+            - *manufacturerCode
+            - *imageType
+            - *applicationRelease
+            - *applicationBuild
+            - *stackRelease
+            - *stackBuild
+            - <<: *hardwareVersion
+              cond:
+                - *__cond_hardware_version_present
+        - id: "0x03"
+          name: Image Block Request
+          response: "0x05"
+          dir: send
+          required: m
+          payloadattr:
+            - *blockRequestOptions
+            - *manufacturerCode
+            - *imageType
+            - *applicationRelease
+            - *applicationBuild
+            - *stackRelease
+            - *stackBuild
+            - *fileOffset
+            - <<: *dataSize
+              argname: Max Data Size
+
+    client:
+      attr:
+        - *upgradeServer
+        - *fileOffset
+        - *currentFileVersion
+        - *currentStackVersion
+        - *downloadedFileVersion
+        - *downloadedStackVersion
+        - *imageUpgradeStatus
+        - *minBlockRequestDelay
+      cmd:
+        - id: "0x02"
+          name: Query next image response
+          dir: recv
+          required: m
+          payloadattr:
+            - <<: *nextImageStatus
+              argname: Status
+            - <<: *manufacturerCode
+              cond:
+                - *__cond_success
+            - <<: *imageType
+              cond:
+                - *__cond_success
+            - <<: *applicationRelease
+              cond:
+                - *__cond_success
+            - <<: *applicationBuild
+              cond:
+                - *__cond_success
+            - <<: *stackRelease
+              cond:
+                - *__cond_success
+            - <<: *stackBuild
+              cond:
+                - *__cond_success
+            - <<: *imageSize
+              cond:
+                - *__cond_success
+
+        - id: "0x05"
+          name: Image Block Response
+          dir: recv
+          required: m
+          payloadattr:
+            - *status
+            - *manufacturerCode
+            - *imageType
+            - *applicationRelease
+            - *applicationBuild
+            - *stackRelease
+            - *stackBuild
+            - *fileOffset
+            - *payload
+      .cmd:
+        - id: "0x07"
+          name: Upgrade end response
+          dir: recv
+          required: m
+          payloadattr:
+            - id: "0x0000"
+              name: Manufacturer ID
+              type: u16
+              required: true
+              showas: hex
+            - id: "0x0001"
+              name: Image type
+              type: u16
+              required: true
+              showas: hex
+            - id: "0x0002"
+              name: File version
+              type: u32
+              required: true
+              showas: hex
+            - id: "0x0003"
+              name: Current time
+              type: u32
+              required: true
+              showas: hex
+            - id: "0x0004"
+              name: Upgrade time
+              type: u32
+              required: true
+              showas: hex
