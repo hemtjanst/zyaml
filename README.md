@@ -1,5 +1,7 @@
 # zyaml
 
+[![CI](https://github.com/hemtjanst/zyaml/workflows/CI/badge.svg)](https://github.com/hemtjanst/zyaml/actions?query=workflow%3ACI)
+
 This repository contains a YAML representation of the set of Zigbee™
 specifications for the purposes of generating a Zigbee protocol stack
 implementation.
@@ -14,10 +16,10 @@ implementation.
 
 ## Libraries
 
-| Language | Repository |
-| --- | --- |
-| Go | [hemtjanst/zcl] |
-| TypeScript | [hemtjanst/zcl] |
+| Language | Repository | Auto-update on merge |
+| --- | --- | -- |
+| Go | [hemtjanst/zcl] | ✔️ |
+| TypeScript | [hemtjanst/zcl] | ✔️ |
 
 [hemtjanst/zcl]: https://github.com/hemtjanst/zcl
 
