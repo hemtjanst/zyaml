@@ -12,6 +12,15 @@ implementation.
 >
 > <cite>https://en.wikipedia.org/wiki/ZigBee</cite>
 
+## Libraries
+
+| Language | Repository |
+| --- | --- |
+| Go | [hemtjanst/zcl] |
+| TypeScript | [hemtjanst/zcl] |
+
+[hemtjanst/zcl]: https://github.com/hemtjanst/zcl
+
 ## Source material
 
 The specification can be retrieved from the Zigbee Alliance
