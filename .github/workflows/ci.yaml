@@ -46,7 +46,7 @@ jobs:
     - name: Run ZCL tests
       working-directory: ./zcl
       run: |
-        go test hemtjan.st/zcl/...
+        go test -v hemtjan.st/zcl/...
   update:
     name: Push updated ZCL
     if: ${{ github.ref == 'master' }}
