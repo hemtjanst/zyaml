@@ -1,9 +1,13 @@
 name: CI
 on:
   pull_request:
+    paths:
+      - '**.yaml'
     branches:
       - master
   push:
+    paths:
+      - '**.yaml'
     branches:
       - master
 
