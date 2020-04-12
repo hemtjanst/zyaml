@@ -49,7 +49,7 @@ jobs:
         go test -v hemtjan.st/zcl/...
   update:
     name: Push updated ZCL
-    if: ${{ github.ref == 'master' }}
+    if: github.ref == 'refs/heads/master'
     needs: generate_and_test
     runs-on: ubuntu-latest
     steps:
