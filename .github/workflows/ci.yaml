@@ -76,8 +76,7 @@ jobs:
         git config user.name "Hemtjanst Bot"
         git config user.email "63548820+hemtjanst-bot@users.noreply.github.com"
         git add .
-        git commit -m "Update to zyaml ${GITHUB_SHA}"
-        git commit -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
+        git commit -m "Update to zyaml ${GITHUB_SHA}" -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
     - name: Push
       working-directory: ./zcl
       run: |
