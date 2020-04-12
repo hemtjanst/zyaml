@@ -1,0 +1,80 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Lint YAML
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - name: Install YAMLlint
+      run: pip install yamllint 
+    - name: Run the linter
+      run: yamllint --strict -c ./.yamllint.yaml *.yaml **/*.yaml
+  generate_and_test:
+    name: Generate and test ZCL
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      path: zyaml
+    - uses: actions/checkout@v2
+      with: hemtjanst/zcl
+      path: zcl
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: '1.14'
+    - name: Run zclgen
+      working-directory: ./zcl
+      run: |
+        go run hemtjan.st/zcl/cmd/zclgen -definition-path ../zyaml
+    - name: Build updated ZCL
+      working-directory: ./zcl
+      run: |
+        go build hemtjan.st/zcl/...
+    - name: Run ZCL tests
+      working-directory: ./zcl
+      run: |
+        go test hemtjan.st/zcl/...
+  update:
+    name: Push updated ZCL
+    if: ${{ github.ref == 'master' }}
+    needs: generate_and_test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      path: zyaml
+    - uses: actions/checkout@v2
+      with: hemtjanst/zcl
+      path: zcl
+      ssh-key: ${{ secrets.BOT_SSH_KEY }}
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: '1.14'
+    - name: Run zclgen
+      working-directory: ./zcl
+      run: |
+        go run hemtjan.st/zcl/cmd/zclgen -definition-path ../zyaml
+        go build hemtjan.st/zcl/...
+        go mod tidy
+    - name: Commit
+      working-directory: ./zcl
+      run: |
+        git config user.name "Hemtjanst Bot"
+        git config user.email "63548820+hemtjanst-bot@users.noreply.github.com"
+        git add .
+        git commit -m "Update ZCL to zyaml ${GITHUB_SHA}"
+        git commit -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
+    - name: Push
+      working-directory: ./zcl
+      run: |
+        git push
