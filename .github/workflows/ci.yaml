@@ -76,6 +76,8 @@ jobs:
         go mod tidy
     - name: Commit, push and PR
       working-directory: ./zcl
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
         if test -n "$(git status -s)"; then
           git config user.name "Hemtjanst Bot"
@@ -84,7 +86,7 @@ jobs:
           git add .
           git commit -m "Update to zyaml ${GITHUB_SHA}" -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
           git push origin zyaml-${GITHUB_SHA}
-          GITHUB_TOKEN=${{ secrets.BOT_GITHUB_TOKEN }} hub pull-request -m "Update ZCL to zyaml ${GITHUB_SHA}" --reviewer daenney,bonan
+          hub pull-request -m "Update ZCL to zyaml ${GITHUB_SHA}" --reviewer daenney,bonan
         else
           echo "No changes to generated code"
         fi
