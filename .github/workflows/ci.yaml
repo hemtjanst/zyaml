@@ -74,18 +74,17 @@ jobs:
         go run hemtjan.st/zcl/cmd/zclgen -definition-path ../zyaml
         go build hemtjan.st/zcl/...
         go mod tidy
-    - name: Commit
+    - name: Commit, push and PR
       working-directory: ./zcl
       run: |
         if test -n "$(git status -s)"; then
           git config user.name "Hemtjanst Bot"
           git config user.email "63548820+hemtjanst-bot@users.noreply.github.com"
+          git checkout -b zyaml-${GITHUB_SHA}
           git add .
           git commit -m "Update to zyaml ${GITHUB_SHA}" -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
+          git push origin zyaml-${GITHUB_SHA}
+          GITHUB_TOKEN=${{ secrets.BOT_GITHUB_TOKEN }} hub pull-request -m "Update ZCL to zyaml ${GITHUB_SHA}" --reviewer daenney,bonan
         else
           echo "No changes to generated code"
         fi
-    - name: Push
-      working-directory: ./zcl
-      run: |
-        git push
