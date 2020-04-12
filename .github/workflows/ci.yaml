@@ -26,10 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      path: zyaml
+      with:
+        path: zyaml
     - uses: actions/checkout@v2
-      with: hemtjanst/zcl
-      path: zcl
+      with:
+        repository: hemtjanst/zcl
+        path: zcl
     - uses: actions/setup-go@v2-beta
       with:
         go-version: '1.14'
@@ -52,11 +54,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      path: zyaml
+      with:
+        path: zyaml
     - uses: actions/checkout@v2
-      with: hemtjanst/zcl
-      path: zcl
-      ssh-key: ${{ secrets.BOT_SSH_KEY }}
+      with:
+        repository: hemtjanst/zcl
+        path: zcl
+        ssh-key: ${{ secrets.BOT_SSH_KEY }}
     - uses: actions/setup-go@v2-beta
       with:
         go-version: '1.14'
