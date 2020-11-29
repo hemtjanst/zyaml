@@ -22,6 +22,28 @@ types:
     access: r
     default: "0xffffffff"
     showas: hex
+  NewFileVersion: &newFileVersion
+    name: New File Version
+    type: u32
+    access: rw
+    default: "0xffffffff"
+    showas: hex
+  ImageNotifyPayloadType: &imageNotifyPayloadType
+    name: Image Notify Payload Type
+    type: enum8
+    access: rw
+    values:
+      "0x00": Query jitter
+      "0x01": Query jitter and manufacturer code
+      "0x02": Query jitter, manufacturer code, and image type
+      "0x03": Query jitter, manufacturer code, image type, and new file version
+  QueryJitter: &queryJitter
+    name: Query jitter
+    type: u8
+    access: rw
+    default: "0x32"
+    required: true
+    range: 0x01,0x64
   CurrentStackVersion: &currentStackVersion
     id: "0x0003"
     name: Current Stack Version
@@ -207,6 +229,16 @@ clusters:
         - *imageUpgradeStatus
         - *minBlockRequestDelay
       cmd:
+        - id: "0x00"
+          name: Image notify
+          dir: send
+          required: o
+          payloadattr:
+            - *imageNotifyPayloadType
+            - *queryJitter
+            - *manufacturerCode
+            - *imageType
+            - *newFileVersion
         - id: "0x02"
           name: Query next image response
           dir: recv
