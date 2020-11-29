@@ -236,9 +236,21 @@ clusters:
           payloadattr:
             - *imageNotifyPayloadType
             - *queryJitter
-            - *manufacturerCode
-            - *imageType
-            - *newFileVersion
+            - <<: *manufacturerCode
+              cond:
+                - name: Image Notify Payload Type
+                  value: 0x01
+                  operator: ">="
+            - <<: *imageType
+              cond:
+                - name: Image Notify Payload Type
+                  value: 0x02
+                  operator: ">="
+            - <<: *newFileVersion
+              cond:
+                - name: Image Notify Payload Type
+                  value: 0x03
+                  operator: ">="
         - id: "0x02"
           name: Query next image response
           dir: recv
