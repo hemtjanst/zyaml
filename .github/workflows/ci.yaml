@@ -36,7 +36,7 @@ jobs:
       with:
         repository: hemtjanst/zcl
         path: zcl
-    - uses: actions/setup-go@v2-beta
+    - uses: actions/setup-go@v2
       with:
         go-version: '1.14'
     - name: Run zclgen
@@ -65,7 +65,7 @@ jobs:
         repository: hemtjanst/zcl
         path: zcl
         ssh-key: ${{ secrets.BOT_SSH_KEY }}
-    - uses: actions/setup-go@v2-beta
+    - uses: actions/setup-go@v2
       with:
         go-version: '1.14'
     - name: Run zclgen
