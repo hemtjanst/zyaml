@@ -382,6 +382,969 @@ types:
     range: 0x01,0xfe
     default: "0x01"
 
+  ElectricalMeasurementType: &electricalMeasurementType
+    id: "0x0000"
+    name: Electrical Measurement Type
+    type: bmp32
+    bits:
+      "0": Active measurement (AC)
+      "1": Reactive measurement (AC)
+      "2": Apparent measurement (AC)
+      "3": Phase A measurement
+      "4": Phase B measurement
+      "5": Phase C measurement
+      "6": DC measurement
+      "7": Harmonics measurement
+      "8": Power quality measurement
+  DcVoltage: &dcVoltage #  -32767 – 32767 R 0x8000 O
+    name: DC Voltage
+    id: "0x0100"
+    type: s16
+    unit: Volts
+    description: |
+      represents the most recent DC voltage reading in Volts (V). If the voltage cannot be
+      measured, a value of 0x8000 is returned.
+  DcVoltageMin: &dcVoltageMin #  -32767 – 32767 R 0x8000 O
+    name: DC Voltage Min
+    id: "0x0101"
+    type: s16
+    unit: Volts
+    description: |
+      represents the lowest DC voltage value measured in Volts (V). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcVoltageMax: &dcVoltageMax #  -32767 – 32767 R 0x8000 O
+    name: DC Voltage Max
+    id: "0x0102"
+    type: s16
+    unit: Volts
+    description: |
+      represents the highest DC voltage value measured in Volts (V). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcCurrent: &dcCurrent #  -32767 – 32767 R 0x8000 O
+    name: DC Current
+    id: "0x0103"
+    type: s16
+    unit: Amperes
+    description: |
+      represents the most recent DC current reading in Amps (A). If the current cannot be
+      measured, a value of 0x8000 is returned.
+  DcCurrentMin: &dcCurrentMin #  -32767 – 32767 R 0x8000 O
+    name: DC Current Min
+    id: "0x0104"
+    type: s16
+    unit: Amperes
+    description: |
+      represents the lowest DC current value measured in Amps (A). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcCurrentMax: &dcCurrentMax #  -32767 – 32767 R 0x8000 O
+    name: DC Current Max
+    id: "0x0105"
+    type: s16
+    unit: Amperes
+    description: |
+      represents the highest DC current value measured in Amps (A). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcPower: &dcPower #  -32767 – 32767 R 0x8000 O
+    name: DC Power
+    id: "0x0106"
+    type: s16
+    unit: Watts
+    description: |
+      represents the most recent DC power reading in Watts (W). If the power cannot be
+      measured, a value of 0x8000 is returned.
+  DcPowerMin: &dcPowerMin #  -32767 – 32767 R 0x8000 O
+    name: DC Power Min
+    id: "0x0107"
+    type: s16
+    unit: Watts
+    description: |
+      represents the lowest DC power value measured in Watts (W). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcPowerMax: &dcPowerMax #  -32767 – 32767 R 0x8000 O
+    name: DC Power Max
+    id: "0x0108"
+    type: s16
+    unit: Watts
+    description: |
+      represents the highest DC power value measured in Watts (W). After resetting,
+      this attribute will return a value of 0x8000 until a measurement is made.
+  DcVoltageMultiplier: &dcVoltageMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Voltage Multiplier
+    id: "0x0200"
+    type: u16
+    description: |
+      provides a value to be multiplied against the DCVoltage, DCVoltageMin, and DCVoltageMax attributes.
+      This attribute must be used in conjunction with the DCVoltageDivisor attribute.
+      0x0000 is an invalid value for this attribute
+  DcVoltageDivisor: &dcVoltageDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Voltage Divisor
+    id: "0x0201"
+    type: u16
+    description: |
+      provides a value to be divided against the DCVoltage, DCVoltageMin, and DCVoltageMax attributes.
+      This attribute must be used in conjunction with the DCVoltageMultiplier attribute.
+      0x0000 is an invalid value for this attribute.
+  DcCurrentMultiplier: &dcCurrentMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Current Multiplier
+    id: "0x0202"
+    type: u16
+    description: |
+      provides a value to be multiplied against the DCCurrent, DCCurrentMin, and DCCurrentMax attributes.
+      This attribute must be used in conjunction with the DCCurrentDivisor attribute.
+      0x0000 is an invalid value for this attribute.
+  DcCurrentDivisor: &dcCurrentDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Current Divisor
+    id: "0x0203"
+    type: u16
+    description: |
+      provides a value to be divided against the DCCurrent, DCCurrentMin, and DCCurrentMax attributes.
+      This attribute must be used in conjunction with the DCCurrentMultiplier attribute.
+      0x0000 is an invalid value for this attribute.
+  DcPowerMultiplier: &dcPowerMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Power Multiplier
+    id: "0x0204"
+    type: u16
+    description: |
+      provides a value to be multiplied against the DCPower, DCPowerMin, and DCPowerMax attributes.
+      This attribute must be used in conjunction with the DCPowerDivisor attribute.
+      0x0000 is an invalid value for this attribute.
+  DcPowerDivisor: &dcPowerDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: DC Power Divisor
+    id: "0x0205"
+    type: u16
+    description: |
+      provides a value to be divided against the DCPower, DCPowerMin, and DCPowerMax attributes.
+      This attribute must be used in conjunction with the DCPowerMultiplier attribute.
+      0x0000 is an invalid value for this attribute
+  AcFrequency: &acFrequency #  0x0000 – 0xFFFF R 0xFFFF O
+    name: AC Frequency
+    id: "0x0300"
+    type: u16
+    unit: Hertz
+    description: |
+      represents the most recent AC Frequency reading in Hertz (Hz). If the frequency
+      cannot be measured, a value of 0xFFFF is returned.
+  AcFrequencyMin: &acFrequencyMin #  0x0000 – 0xFFFF R 0xFFFF O
+    name: AC Frequency Min
+    id: "0x0301"
+    type: u16
+    unit: Hertz
+    description: |
+      attribute represents the lowest AC Frequency value measured in Hertz (Hz). After
+      resetting, this attribute will return a value of 0xFFFF until a measurement is made.
+  AcFrequencyMax: &acFrequencyMax #  0x0000 – 0xFFFF R 0xFFFF O
+    name: AC Frequency Max
+    id: "0x0302"
+    type: u16
+    unit: Hertz
+    description: |
+      attribute represents the highest AC Frequency value measured in Hertz (Hz). After
+      resetting, this attribute will return a value of 0xFFFF until a measurement is made.
+  NeutralCurrent: &neutralCurrent #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Neutral Current
+    id: "0x0303"
+    type: u16
+    unit: Amperes
+    description: |
+      represents the AC neutral (Line-Out) current value at the moment in time the
+      attribute is read. If the instantaneous current cannot be measured, a value of 0xFFFF is returned
+  TotalActivePower: &totalActivePower #  -8,388,607–8,388,607 R - O
+    name: Total Active Power
+    id: "0x0304"
+    type: s32
+    unit: Kilowatts
+    description: |
+      represents the current demand of active power delivered or received at the premises, in kW.
+      Positive values indicate power delivered to the premises where negative values indicate power received from
+      the premises. In case if device is capable of measuring multi elements or phases then this will be net active
+      power value.
+  TotalReactivePower: &totalReactivePower #  -8,388,607–8,388,607 R - O
+    name: Total Reactive Power
+    id: "0x0305"
+    type: s32
+    unit: KiloVoltAmperesReactive
+    description: |
+      represents the current demand of reactive power delivered or received at the premises, in kVAr.
+      Positive values indicate power delivered to the premises where negative values indicate power received from the premises.
+      In case if device is capable of measuring multi elements or phases then this will be net reactive power value.
+  TotalApparentPower: &totalApparentPower #  0x000000–0xFFFFFF R - O
+    name: Total Apparent Power
+    id: "0x0306"
+    type: u32
+    unit: KiloVoltAmperes
+    description: |
+      represents the current demand of apparent power.
+  Measured1StHarmonicCurrent: &measured1stHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 1st Harmonic Current
+    id: "0x0307"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 1st harmonic current reading in an AC frequency.
+      The unit for this measurement is 10 ^ 1stHarmonicCurrentMultiplier amperes.
+      If 1stHarmonicCurrentMultiplier is not implemented the unit is in amperes.
+      If the 1st harmonic current cannot be measured a value of 0x8000 is returned.
+      A positive value indicates the measured 1st harmonic current is positive, and a
+      negative value indicates that the measured 1st harmonic current is negative.
+  Measured3RdHarmonicCurrent: &measured3rdHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 3rd Harmonic Current
+    id: "0x0308"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 3rd harmonic current reading in an AC frequency.
+  Measured5ThHarmonicCurrent: &measured5thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 5th Harmonic Current
+    id: "0x0309"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 5th harmonic current reading in an AC frequency.
+  Measured7ThHarmonicCurrent: &measured7thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 7th Harmonic Current
+    id: "0x030A"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 7th harmonic current reading in an AC frequency.
+  Measured9ThHarmonicCurrent: &measured9thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 9th Harmonic Current
+    id: "0x030B"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 9th harmonic current reading in an AC frequency.
+  Measured11ThHarmonicCurrent: &measured11thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured 11th Harmonic Current
+    id: "0x030C"
+    type: s16
+    unit: Amperes
+    description: |
+      represent the most recent 11th harmonic current reading in an AC frequency.
+  MeasuredPhase1StHarmonicCurrent: &measuredPhase1stHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 1st Harmonic Current
+    id: "0x030D"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 1st harmonic current reading in an AC frequency.
+      The unit for this measurement is 10 ^ Phase1StHarmonicCurrentMultiplier degree.
+      If Phase1StHarmonicCurrentMultiplier is not implemented the unit is in degree.
+      If the phase of cannot be measured a value of 0x8000 is returned.
+      A positive value indicates the measured phase is prehurry,
+      and a negative value indicates that the measured phase is lagging.
+  MeasuredPhase3RdHarmonicCurrent: &measuredPhase3rdHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 3rd Harmonic Current
+    id: "0x030E"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 3rd harmonic current reading in an AC frequency.
+  MeasuredPhase5ThHarmonicCurrent: &measuredPhase5thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 5th Harmonic Current
+    id: "0x030F"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 5th harmonic current reading in an AC frequency.
+  MeasuredPhase7ThHarmonicCurrent: &measuredPhase7thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 7th Harmonic Current
+    id: "0x0310"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 7th harmonic current reading in an AC frequency.
+  MeasuredPhase9ThHarmonicCurrent: &measuredPhase9thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 9th Harmonic Current
+    id: "0x0311"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 9th harmonic current reading in an AC frequency.
+  MeasuredPhase11ThHarmonicCurrent: &measuredPhase11thHarmonicCurrent #  -32768 – 32767 R 0x8000 O
+    name: Measured Phase 11th Harmonic Current
+    id: "0x0312"
+    type: s16
+    unit: DegreesPhase
+    description: |
+      represent the most recent phase of the 11th harmonic current reading in an AC frequency.
+  AcFrequencyMultiplier: &acFrequencyMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Frequency Multiplier
+    id: "0x0400"
+    type: u16
+    description: |
+      Provides a value to be multiplied against the ACFrequency attribute.
+      This attribute must be used in conjunction with the ACFrequencyDivisor attribute.
+      0x0000 is an invalid value for this attribute.
+  AcFrequencyDivisor: &acFrequencyDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Frequency Divisor
+    id: "0x0401"
+    type: u16
+    description: |
+      Provides a value to be divided against the ACFrequency attribute. This attribute must be used in conjunction
+      with the ACFrequencyMultiplier attribute. 0x0000 is an invalid value for this attribute.
+  PowerMultiplier: &powerMultiplier #  0x000000 – 0xFFFFFF R 0x000001 O
+    name: Power Multiplier
+    id: "0x0402"
+    type: u32
+    description: |
+      Provides a value to be multiplied against a raw or uncompensated sensor count of power being measured by
+      the metering device. If present, this attribute must be applied against all power/demand values to derive the
+      delivered and received values expressed in the specified units. This attribute must be used in conjunction with
+      the PowerDivisor attribute.
+  PowerDivisor: &powerDivisor #  0x00000 – 0xFFFFFF R 0x000001 O
+    name: Power Divisor
+    id: "0x0403"
+    type: u32
+    description: |
+      Provides a value to divide against the results of applying the Multiplier attribute against a raw or
+      uncompensated sensor count of power being measured by the metering device.
+      If present, this attribute must be applied against all demand/power values to derive the delivered and received
+      values expressed in the specified units. This attribute must be used in conjunction with the PowerMultiplier attribute.
+  HarmonicCurrentMultiplier: &harmonicCurrentMultiplier #  -127 – 127 R 0x00 O
+    name: Harmonic Current Multiplier
+    id: "0x0404"
+    type: s8
+    description: |
+      Represents the unit value for the MeasuredNthHarmonicCurrent attribute in the format
+      MeasuredNthHarmonicCurrent * 10 ^ HarmonicCurrentMultiplier amperes.
+  PhaseHarmonicCurrentMultiplier: &phaseHarmonicCurrentMultiplier #  -127 – 127 R 0x00 O
+    name: Phase Harmonic Current Multiplier
+    id: "0x0405"
+    type: s8
+    description: |
+      Represents the unit value for the MeasuredPhaseNthHarmonicCurrent attribute in the format
+      MeasuredPhaseNthHarmonicCurrent * 10 ^ PhaseHarmonicCurrentMultiplier degrees.
+  LineCurrent: &lineCurrent # 0x0000 – 0xFFFF R 0xFFFF O
+    id: "0x0501"
+    name: Line Current
+    type: u16
+    unit: Amperes
+    description: |
+      Represents the single phase or Phase A, AC line current (Square root of active and reactive current) value at
+      the moment in time the attribute is read. If it cannot be measured, a value of 0x8000 is returned.
+  ActiveCurrent: &activeCurrent # -32768 – 32767 R 0x8000 O
+    id: "0x0502"
+    name: Active Current
+    type: s16
+    unit: Amperes
+    description: |
+      Represents the single phase or Phase A, AC active/resistive current value at the moment in time the attribute
+      is read, in Amps (A). Positive values indicate power delivered to the premises where negative values indicate
+      power received from the premises.
+  ReactiveCurrent: &reactiveCurrent # -32768 – 32767 R 0x8000 O
+    id: "0x0503"
+    name: Reactive Current
+    type: s16
+    unit: Amperes
+    description: |
+      Represents the single phase or Phase A, AC reactive current value at the moment in time the attribute is read,
+      in Amps (A). Positive values indicate power delivered to the premises where negative values indicate power
+      received from the premises.
+  RmsVoltage: &rmsVoltage #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Voltage
+    id: "0x0505"
+    type: u16
+    report: true
+    unit: Volts
+    description: |
+      represents the most recent RMS voltage reading.
+      If the RMS voltage cannot be measured, a value of 0xFFFF is returned
+  RmsVoltageMin: &rmsVoltageMin #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Voltage Min
+    id: "0x0506"
+    type: u16
+    unit: Volts
+    description: |
+      Represents the lowest RMS voltage value.
+      After resetting, this attribute will return a value of 0xFFFF until a measurement is made.
+  RmsVoltageMax: &rmsVoltageMax #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Voltage Max
+    id: "0x0507"
+    type: u16
+    unit: Volts
+    description: |
+      Represents the highest RMS voltage value.
+      After resetting, this attribute will return a value of 0xFFFF until a measurement is made.
+  RmsCurrent: &rmsCurrent #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current
+    id: "0x0508"
+    type: u16
+    report: true
+    unit: Amperes
+    description: |
+      Represents the most recent RMS current reading.
+  RmsCurrentMin: &rmsCurrentMin #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Min
+    id: "0x0509"
+    type: u16
+    unit: Amperes
+    description: |
+      Represents the lowest RMS current value.
+  RmsCurrentMax: &rmsCurrentMax #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Max
+    id: "0x050A"
+    type: u16
+    unit: Amperes
+    description: |
+      Represents the highest RMS current value.
+  ActivePower: &activePower #  -32768 – 32767 R 0x8000 O
+    name: Active Power
+    id: "0x050B"
+    type: s16
+    report: true
+    unit: Watts
+    description: |
+      Represents the single phase or Phase A, current demand of active power delivered or received at the premises.
+      Positive values indicate power delivered to the premises where negative values indicate power received from the premises.
+  ActivePowerMin: &activePowerMin #  -32768 – 32767 R 0x8000 O
+    name: Active Power Min
+    id: "0x050C"
+    type: s16
+    unit: Watts
+    description: |
+      Represents the lowest AC power value
+  ActivePowerMax: &activePowerMax #  -32768 – 32767 R 0x8000 O
+    name: Active Power Max
+    id: "0x050D"
+    type: s16
+    unit: Watts
+    description: |
+      Represents the highest AC power value
+  ReactivePower: &reactivePower #  -32768 – 32767 R 0x8000 O
+    name: Reactive Power
+    id: "0x050E"
+    type: s16
+    unit: VoltAmperesReactive
+    description: |
+      Represents the single phase or Phase A, current demand of reactive power delivered or received at the
+      premises, in VAr. Positive values indicate power delivered to the premises where negative values indicate
+      power received from the premises.
+  ApparentPower: &apparentPower #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Apparent Power
+    id: "0x050F"
+    type: u16
+    unit: VoltAmperes
+    description: |
+      Represents the single phase or Phase A, current demand of apparent (Square root of active and reactive
+      power) power, in VA.
+  PowerFactor: &powerFactor #  -100 to +100 R 0x00 O
+    name: Power Factor
+    id: "0x0510"
+    type: s8
+    description: contains the single phase or PhaseA, Power Factor ratio in 1/100ths
+  AverageRmsVoltageMeasurementPeriod: &averageRMSVoltageMeasurementPeriod #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Voltage Measurement Period
+    id: "0x0511"
+    type: u16
+    access: rw
+    unit: Seconds
+    description: is the period that the RMS voltage is averaged over.
+  AverageRmsOverVoltageCounter: &averageRMSOverVoltageCounter #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Over Voltage Counter
+    id: "0x0512"
+    type: u16
+    access: rw
+    description: |
+      is the number of times the average RMS voltage, has been above the AverageRMS OverVoltage threshold
+      since last reset. This counter may be reset by writing zero to the attribute.
+  AverageRmsUnderVoltageCounter: &averageRMSUnderVoltageCounter #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Under Voltage Counter
+    id: "0x0513"
+    type: u16
+    access: rw
+    description: |
+      is the number of times the average RMS voltage, has been below the AverageRMS underVoltage threshold
+      since last reset. This counter may be reset by writing zero to the attribute.
+  RmsExtremeOverVoltagePeriod: &rmsExtremeOverVoltagePeriod #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Over Voltage Period
+    id: "0x0514"
+    type: u16
+    unit: Seconds
+    access: rw
+    description: is the durations used to measure an extreme over voltage condition.
+  RmsExtremeUnderVoltagePeriod: &rmsExtremeUnderVoltagePeriod #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Under Voltage Period
+    id: "0x0515"
+    type: u16
+    unit: Seconds
+    access: rw
+    description: is the duration used to measure an extreme under voltage condition.
+  RmsVoltageSagPeriod: &rmsVoltageSagPeriod #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Sag Period
+    id: "0x0516"
+    type: u16
+    unit: Seconds
+    access: rw
+    description: is the duration used to measure a voltage sag condition.
+  RmsVoltageSwellPeriod: &rmsVoltageSwellPeriod #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Swell Period
+    id: "0x0517"
+    type: u16
+    unit: Seconds
+    access: rw
+    description: is the duration used to measure a voltage swell condition.
+  AcVoltageMultiplier: &acVoltageMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Voltage Multiplier
+    id: "0x0600"
+    type: u16
+    description: |
+      Provides a value to be multiplied against the InstantaneousVoltage and RMSVoltage attributes. This attribute
+      must be used in conjunction with the ACVoltageDivisor attribute. 0x0000 is an invalid value for this attribute.
+  AcVoltageDivisor: &acVoltageDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Voltage Divisor
+    id: "0x0601"
+    type: u16
+    description: |
+      Provides a value to be divided against the InstantaneousVoltage and RMSVoltage attributes. This attribute
+      must be used in conjunction with the ACVoltageMultiplier attribute. 0x0000 is an invalid value for this
+      attribute.
+  AcCurrentMultiplier: &acCurrentMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Current Multiplier
+    id: "0x0602"
+    type: u16
+    description: |
+      Provides a value to be multiplied against the InstantaneousCurrent and RMSCurrent attributes. This attribute
+      must be used in conjunction with the ACCurrentDivisor attribute. 0x0000 is an invalid value for this attribute.
+  AcCurrentDivisor: &acCurrentDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Current Divisor
+    id: "0x0603"
+    type: u16
+    description: |
+      Provides a value to be divided against the ACCurrent, InstantaneousCurrent and RMSCurrent attributes.
+      This attribute must be used in conjunction with the ACCurrentMultiplier attribute. 0x0000 is an invalid value
+      for this attribute
+  AcPowerMultiplier: &acPowerMultiplier #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Power Multiplier
+    id: "0x0604"
+    type: u16
+    description: |
+      Provides a value to be multiplied against the InstantaneousPower and ActivePower attributes. This attribute
+      must be used in conjunction with the ACPowerDivisor attribute. 0x0000 is an invalid value for this attribute.
+  AcPowerDivisor: &acPowerDivisor #  0x0001 – 0xFFFF R 0x0001 O
+    name: AC Power Divisor
+    id: "0x0605"
+    type: u16
+    description: |
+      Provides a value to be divided against the InstantaneousPower and ActivePower attributes. This attribute
+      must be used in conjunction with the ACPowerMultiplier attribute. 0x0000 is an invalid value for this attribute.
+  DcOverloadAlarmsMask: &dcOverloadAlarmsMask #  0b0000 00xx RW 0b0000 0000 O
+    name: DC Overload Alarms Mask
+    id: "0x0700"
+    type: bmp8
+    access: rw
+    bits:
+      0: Voltage Overload
+      1: Current Overload
+    description: |
+      Specifies which configurable alarms may be generated
+  DcVoltageOverload: &dcVoltageOverload #  -32768 – 32767 R 0xFFFF O
+    name: DC Voltage Overload
+    id: "0x0701"
+    type: s16
+    unit: Volts
+    description: |
+      Specifies the alarm threshold, set by the manufacturer, for the maximum output voltage supported by device.
+      The value is multiplied and divided by the DCVoltageMultiplier the DCVoltageDivisor respectively.
+  DcCurrentOverload: &dcCurrentOverload #  -32768 – 32767 R 0xFFFF O
+    name: DC Current Overload
+    id: "0x0702"
+    type: s16
+    unit: Amperes
+    description: |
+      Specifies the alarm threshold, set by the manufacturer, for the maximum output current supported by device.
+      The value is multiplied and divided by the DCCurrentMultiplier and DCCurrentDivider respectively.
+  AcAlarmsMask: &acAlarmsMask #  0b0000 xxxx RW 0b00000000 O
+    name: AC Alarms Mask
+    id: "0x0800"
+    type: bmp16
+    access: rw
+    bits:
+      0: Voltage Overload
+      1: Current Overload
+      2: Active Power Overload
+      3: Reactive Power Overload
+      4: Average RMS Over Voltage
+      5: Average RMS Under Voltage
+      6: RMS Extreme Over Voltage
+      7: RMS Extreme Under Voltage
+      8: RMS Voltage Sag
+      9: RMS Voltage Swell
+    description: |
+      specifies which configurable alarms may be generated
+  AcVoltageOverload: &acVoltageOverload #  -32768 – 32767 R 0xFFFF O
+    name: AC Voltage Overload
+    id: "0x0801"
+    type: s16
+    unit: Volts
+    description: |
+      specifies the alarm threshold, set by the manufacturer, for the maximum output voltage supported by device.
+      The value is multiplied and divided by the ACVoltageMultiplier the ACVoltageDivisor, respectively. The
+      value is voltage RMS.
+  AcCurrentOverload: &acCurrentOverload #  -32768 – 32767 R 0xFFFF O
+    name: AC Current Overload
+    id: "0x0802"
+    type: s16
+    unit: Amperes
+    description: |
+      specifies the alarm threshold, set by the manufacturer, for the maximum output current supported by device.
+      The value is multiplied and divided by the ACCurrentMultiplier and ACCurrentDivider, respectively. The
+      value is current RMS.
+  AcActivePowerOverload: &acActivePowerOverload #  -32768 – 32767 R 0xFFFF O
+    name: AC Active Power Overload
+    id: "0x0803"
+    type: s16
+    unit: Watts
+    description: |
+      specifies the alarm threshold, set by the manufacturer, for the maximum output active power supported by
+      device. The value is multiplied and divided by the ACPowerMultiplier and ACPowerDivisor, respectively.
+  AcReactivePowerOverload: &acReactivePowerOverload #  -32768 – 32767 R 0xFFFF O
+    name: AC Reactive Power Overload
+    id: "0x0804"
+    type: s16
+    description: |
+      specifies the alarm threshold, set by the manufacturer, for the maximum output reactive power supported by
+      device. The value is multiplied and divided by the ACPowerMultiplier and ACPowerDivisor, respectively.
+  AverageRmsOverVoltage: &averageRMSOverVoltage #  -32768 – 32767 R O
+    name: Average RMS over-voltage
+    id: "0x0805"
+    type: s16
+    unit: Volts
+    description: |
+      is the average RMS voltage above which an over voltage condition is reported.
+      The threshold shall be configurable within the specified operating range of the electricity meter.
+      The value is multiplied and divided by the ACVoltageMultiplier and ACVoltageDivisor, respectively.
+  AverageRmsUnderVoltage: &averageRMSUnderVoltage #  -32768 – 32767 R O
+    name: Average RMS under-voltage
+    id: "0x0806"
+    type: s16
+    unit: Volts
+    description: |
+      is the average RMS voltage below which an under voltage condition is reported.
+      The threshold shall be configurable within the specified operating range of the electricity meter.
+      The value is multiplied and divided by the ACVoltageMultiplier and ACVoltageDivisor, respectively.
+  RmsExtremeOverVoltage: &rmsExtremeOverVoltage #  -32768 – 32767 RW O
+    name: RMS extreme over-voltage
+    id: "0x0807"
+    type: s16
+    unit: Volts
+    access: rw
+    description: |
+      is the RMS voltage above which an extreme under voltage condition is reported.
+      The threshold shall be configurable within the specified operating range of the electricity meter.
+      The value is multiplied and divided by the ACVoltageMultiplier and ACVoltageDivisor, respectively.
+  RmsExtremeUnderVoltage: &rmsExtremeUnderVoltage #  -32768 – 32767 RW O
+    name: RMS extreme under-voltage
+    id: "0x0808"
+    type: s16
+    unit: Volts
+    access: rw
+    description: |
+      is the RMS voltage below which an extreme under voltage condition is reported. The threshold shall be configurable within the specified operating range of the electricity meter. The value is multiplied and divided by
+      the ACVoltageMultiplier and ACVoltageDivisor, respectively.
+  RmsVoltageSag: &rmsVoltageSag #  -32768 – 32767 RW O
+    name: RMS Voltage Sag
+    id: "0x0809"
+    type: s16
+    unit: Volts
+    access: rw
+    description: |
+      is the RMS voltage below which a sag condition is reported.
+      The threshold shall be configurable within the specified operating range of the electricity meter.
+      The value is multiplied and divided by the ACVoltageMultiplier and ACVoltageDivisor, respectively
+  RmsVoltageSwell: &rmsVoltageSwell #  -32768 – 32767 RW O
+    name: RMS Voltage Swell
+    id: "0x080A"
+    type: s16
+    access: rw
+    unit: Volts
+    description: |
+      is the RMS voltage above which a swell condition is reported.
+      The threshold shall be configurable within the specified operating range of the electricity meter.
+      The value is multiplied and divided by the ACVoltageMultiplier and ACVoltageDivisor, respectively
+  LineCurrentPhB: &lineCurrentPhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Line Current Ph B
+    id: "0x0901"
+    type: u16
+    unit: Amperes
+    description: |
+      represents the Phase B, AC line current (Square root sum of active and reactive currents) value at the moment
+      in time the attribute is read.
+      If the instantaneous current cannot be measured, a value of 0x8000 is returned.
+  ActiveCurrentPhB: &activeCurrentPhB #  -32768 – 32767 R 0x8000 O
+    name: Active Current Ph B
+    id: "0x0902"
+    type: s16
+    unit: Amperes
+    description: |
+      represents the Phase B, AC active/resistive current value at the moment in time the attribute is read.
+      Positive values indicate power delivered to the premises where negative values indicate power received
+      from the premises.
+  ReactiveCurrentPhB: &reactiveCurrentPhB #  -32768 – 32767 R 0x8000 O
+    name: Reactive Current Ph B
+    id: "0x0903"
+    type: s16
+    unit: Amperes
+    description: |
+      represents the Phase B, AC reactive current value at the moment in time the attribute is read.
+      Positive values indicate power delivered to the premises where negative values indicate power received from
+      the premises.
+  RmsVoltagePhB: &rmsVoltagePhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Voltage Ph B
+    id: "0x0905"
+    type: u16
+    unit: Volts
+    description: |
+      represents the most recent RMS voltage reading. If the RMS voltage cannot be measured, a value of 0xFFFF is returned.
+  RmsVoltageMinPhB: &rmsVoltageMinPhB #  0x0000 – 0xFFFF R 0x8000 O
+    name: RMS Voltage Min Ph B
+    id: "0x0906"
+    type: u16
+    unit: Volts
+    description: |
+      represents the lowest RMS voltage value measured. After resetting, this attribute will return a
+      value of 0xFFFF until a measurement is made.
+  RmsVoltageMaxPhB: &rmsVoltageMaxPhB #  0x0000 – 0xFFFF R 0x8000 O
+    name: RMS Voltage Max Ph B
+    id: "0x0907"
+    type: u16
+    unit: Volts
+    description: |
+      represents the highest RMS voltage value measured. After resetting, this attribute will return a
+      value of 0xFFFF until a measurement is made.
+  RmsCurrentPhB: &rmsCurrentPhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Ph B
+    id: "0x0908"
+    type: u16
+  RmsCurrentMinPhB: &rmsCurrentMinPhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Min Ph B
+    id: "0x0909"
+    type: u16
+  RmsCurrentMaxPhB: &rmsCurrentMaxPhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Max Ph B
+    id: "0x090A"
+    type: u16
+  ActivePowerPhB: &activePowerPhB #  -32768 – 32767 R 0x8000 O
+    name: Active Power Ph B
+    id: "0x090B"
+    type: s16
+  ActivePowerMinPhB: &activePowerMinPhB #  -32768 – 32767 R 0x8000 O
+    name: Active Power Min Ph B
+    id: "0x090C"
+    type: s16
+  ActivePowerMaxPhB: &activePowerMaxPhB #  -32768 – 32767 R 0x8000 O
+    name: Active Power Max Ph B
+    id: "0x090D"
+    type: s16
+  ReactivePowerPhB: &reactivePowerPhB #  -32768 – 32767 R 0x8000 O
+    name: Reactive Power Ph B
+    id: "0x090E"
+    type: s16
+  ApparentPowerPhB: &apparentPowerPhB #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Apparent Power Ph B
+    id: "0x090F"
+    type: u16
+  PowerFactorPhB: &powerFactorPhB #  -100 to +100 R 0x00 O
+    name: Power Factor Ph B
+    id: "0x0910"
+    type: s8
+  AverageRmsVoltageMeasurementPeriodPhB: &averageRMSVoltageMeasurementPeriodPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Voltage Measurement Period Ph B
+    id: "0x0911"
+    type: u16
+    access: rw
+  AverageRmsOverVoltageCounterPhB: &averageRMSOverVoltageCounterPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Over Voltage Counter Ph B
+    id: "0x0912"
+    type: u16
+    access: rw
+  AverageRmsUnderVoltageCounterPhB: &averageRMSUnderVoltageCounterPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Under Voltage Counter Ph B
+    id: "0x0913"
+    type: u16
+    access: rw
+  RmsExtremeOverVoltagePeriodPhB: &rmsExtremeOverVoltagePeriodPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Over Voltage Period Ph B
+    id: "0x0914"
+    type: u16
+    access: rw
+  RmsExtremeUnderVoltagePeriodPhB: &rmsExtremeUnderVoltagePeriodPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Under Voltage Period Ph B
+    id: "0x0915"
+    type: u16
+    access: rw
+  RmsVoltageSagPeriodPhB: &rmsVoltageSagPeriodPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Sag Period Ph B
+    id: "0x0916"
+    type: u16
+    access: rw
+  RmsVoltageSwellPeriodPhB: &rmsVoltageSwellPeriodPhB #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Swell Period Ph B
+    id: "0x0917"
+    type: u16
+    access: rw
+  LineCurrentPhC: &lineCurrentPhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Line Current Ph C
+    id: "0x0A01"
+    type: u16
+  ActiveCurrentPhC: &activeCurrentPhC #  -32768 – 32767 R 0x8000 O
+    name: Active Current Ph C
+    id: "0x0A02"
+    type: s16
+  ReactiveCurrentPhC: &reactiveCurrentPhC #  -32768 – 32767 R 0x8000 O
+    name: Reactive Current Ph C
+    id: "0x0A03"
+    type: s16
+  RmsVoltagePhC: &rmsVoltagePhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Voltage Ph C
+    id: "0x0A05"
+    type: u16
+  RmsVoltageMinPhC: &rmsVoltageMinPhC #  0x0000 – 0xFFFF R 0x8000 O
+    name: RMS Voltage Min Ph C
+    id: "0x0A06"
+    type: u16
+  RmsVoltageMaxPhC: &rmsVoltageMaxPhC #  0x0000 – 0xFFFF R 0x8000 O
+    name: RMS Voltage Max Ph C
+    id: "0x0A07"
+    type: u16
+  RmsCurrentPhC: &rmsCurrentPhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Ph C
+    id: "0x0A08"
+    type: u16
+  RmsCurrentMinPhC: &rmsCurrentMinPhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Min Ph C
+    id: "0x0A09"
+    type: u16
+  RmsCurrentMaxPhC: &rmsCurrentMaxPhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: RMS Current Max Ph C
+    id: "0x0A0A"
+    type: u16
+  ActivePowerPhC: &activePowerPhC #  -32768 – 32767 R 0x8000 O
+    name: Active Power Ph C
+    id: "0x0A0B"
+    type: s16
+  ActivePowerMinPhC: &activePowerMinPhC #  -32768 – 32767 R 0x8000 O
+    name: Active Power Min Ph C
+    id: "0x0A0C"
+    type: s16
+  ActivePowerMaxPhC: &activePowerMaxPhC #  -32768 – 32767 R 0x8000 O
+    name: Active Power Max Ph C
+    id: "0x0A0D"
+    type: s16
+  ReactivePowerPhC: &reactivePowerPhC #  -32768 – 32767 R 0x8000 O
+    name: Reactive Power Ph C
+    id: "0x0A0E"
+    type: s16
+  ApparentPowerPhC: &apparentPowerPhC #  0x0000 – 0xFFFF R 0xFFFF O
+    name: Apparent Power Ph C
+    id: "0x0A0F"
+    type: u16
+  PowerFactorPhC: &powerFactorPhC #  -100 to +100 R 0x00 O
+    name: Power Factor Ph C
+    id: "0x0A10"
+    type: s8
+  AverageRmsVoltageMeasurementPeriodPhC: &averageRMSVoltageMeasurementPeriodPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Voltage Measurement Period Ph C
+    id: "0x0A11"
+    type: u16
+    access: rw
+  AverageRmsOverVoltageCounterPhC: &averageRMSOverVoltageCounterPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Over Voltage Counter Ph C
+    id: "0x0A12"
+    type: u16
+    access: rw
+  AverageRmsUnderVoltageCounterPhC: &averageRMSUnderVoltageCounterPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: Average RMS Under Voltage Counter Ph C
+    id: "0x0A13"
+    type: u16
+    access: rw
+  RmsExtremeOverVoltagePeriodPhC: &rmsExtremeOverVoltagePeriodPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Over-voltage Period Ph C
+    id: "0x0A14"
+    type: u16
+    access: rw
+  RmsExtremeUnderVoltagePeriodPhC: &rmsExtremeUnderVoltagePeriodPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Extreme Under-voltage Period Ph C
+    id: "0x0A15"
+    type: u16
+    access: rw
+  RmsVoltageSagPeriodPhC: &rmsVoltageSagPeriodPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Sag Period Ph C
+    id: "0x0A16"
+    type: u16
+    access: rw
+  RmsVoltageSwellPeriodPhC: &rmsVoltageSwellPeriodPhC #  0x0000 – 0xFFFF RW 0x0000 O
+    name: RMS Voltage Swell Period Ph C
+    id: "0x0A17"
+    type: u16
+    access: rw
+
+  ProfileCount: &profileCount
+    name: Profile Count
+    type: u8
+    description: is the total number of supported profiles
+  ProfileIntervalPeriod: &profileIntervalPeriod
+    name: Profile Interval Period
+    type: enum8
+    description: represents the interval or time frame used to capture parameter for profiling purposes
+    values:
+      "0x00": Daily
+      "0x01": 60 minutes
+      "0x02": 30 minutes
+      "0x03": 15 minutes
+      "0x04": 10 minutes
+      "0x05": 7.5 minutes
+      "0x06": 5 minutes
+      "0x07": 2.5 minutes
+  MaxNumberOfIntervals: &maxNumberOfIntervals
+    name: Max Number Of Intervals
+    type: u8
+    description: |
+      represents the maximum number of intervals the device is capable of returning in one command.
+      It is required MaxNumberofIntervals fit within the default Fragmentation ASDU size of 128 bytes,
+      or an optionally agreed upon larger Fragmentation ASDU size supported by both devices.
+  ListOfAttributes: &listOfAttributes
+    name: List Of Attributes
+    type: set
+    arraytype: u16
+    description: |
+      is the list of attributes being profiled
+  StartTime: &startTime
+    name: Start Time
+    type: utc
+    description: |
+      is the end time of the most chronologically recent interval being requested.
+      Example: Data collected from 2:00 PM to 3:00 PM would be specified as a 3:00 PM interval (end time).
+  MeasurementResponseStatus: &measurementResponseStatus
+    name: Measurement Response Status
+    type: enum8
+    values:
+      "0x00": Success
+      "0x01": Attribute Profile not supported
+      "0x02": Invalid Start Time
+      "0x03": More intervals requested than can be returned
+      "0x04": No intervals available for the requested time
+  NumberOfIntervals: &numberOfIntervals
+    name: Number Of Intervals
+    type: u8
+    description: |
+      is the number of intervals requested or returned
+  AttributeId: &attributeID
+    name: Attribute ID
+    type: u16
+  Intervals: &intervals
+    name: Intervals
+    type: array
+    arraytype: u16
+    description: |
+      is a series of interval data captured using the period specified by the ProfileIntervalPeriod field. The
+      content of the interval data depend of the type of information requested using the AttributeID field in the Get
+      Measurement Profile Command. Data is organized in a reverse chronological order, the oldest intervals are
+      transmitted first and the newest interval is transmitted last. Invalid intervals should be marked as 0xFFFF.
+      For scaling and data type use the respective attribute set as defined above in attribute sets.
+
+
+
 clusters:
   - id: "0x0400"
     name: Illuminance measurement
@@ -470,3 +1433,177 @@ clusters:
         - *ultrasonicOccupiedToUnoccupiedDelay
         - *ultrasonicUnoccupiedToOccupiedDelay
         - *ultrasonicUnoccupiedToOccupiedThreshold
+
+  - id: "0x0B04"
+    name: Electrical Measurement
+    description: |
+      provides a mechanism for querying data about the electrical properties as measured by the device.
+      This cluster may be implemented on any device type and be implemented on a per-endpoint basis.
+      For example, a power strip device could represent each outlet on a different endpoint and report
+      electrical information for each individual outlet. The only caveat is that if you implement an
+      attribute that has an associated multiplier and divisor, then you must implement the associated
+      multiplier and divisor attributes. For example if you implement DCVoltage, you must also implement
+      DCVoltageMultiplier and DCVoltageDivisor
+    client:
+      cmd:
+        - id: "0x00"
+          name: Get Profile Info Response
+          dir: recv
+          payloadattr:
+            - *profileCount
+            - *profileIntervalPeriod
+            - *maxNumberOfIntervals
+            - *listOfAttributes
+        - id: "0x01"
+          name: Get Measurement Profile Response
+          dir: recv
+          payloadattr:
+            - *startTime
+            - *measurementResponseStatus
+            - *profileIntervalPeriod
+            - *numberOfIntervals
+            - *attributeID
+            - *intervals
+    server:
+      cmd:
+        - id: "0x00"
+          name: Get Profile Info
+          dir: recv
+          response: "0x01"
+        - id: "0x01"
+          name: Get Measurement Profile
+          dir: recv
+          response: "0x01"
+          payloadattr:
+            - *attributeID
+            - *startTime
+            - *numberOfIntervals
+      attr:
+        - *electricalMeasurementType
+        - *dcVoltage
+        - *dcVoltageMin
+        - *dcVoltageMax
+        - *dcCurrent
+        - *dcCurrentMin
+        - *dcCurrentMax
+        - *dcPower
+        - *dcPowerMin
+        - *dcPowerMax
+        - *dcVoltageMultiplier
+        - *dcVoltageDivisor
+        - *dcCurrentMultiplier
+        - *dcCurrentDivisor
+        - *dcPowerMultiplier
+        - *dcPowerDivisor
+        - *acFrequency
+        - *acFrequencyMin
+        - *acFrequencyMax
+        - *neutralCurrent
+        - *totalActivePower
+        - *totalReactivePower
+        - *totalApparentPower
+        - *measured1stHarmonicCurrent
+        - *measured3rdHarmonicCurrent
+        - *measured5thHarmonicCurrent
+        - *measured7thHarmonicCurrent
+        - *measured9thHarmonicCurrent
+        - *measured11thHarmonicCurrent
+        - *measuredPhase1stHarmonicCurrent
+        - *measuredPhase3rdHarmonicCurrent
+        - *measuredPhase5thHarmonicCurrent
+        - *measuredPhase7thHarmonicCurrent
+        - *measuredPhase9thHarmonicCurrent
+        - *measuredPhase11thHarmonicCurrent
+        - *acFrequencyMultiplier
+        - *acFrequencyDivisor
+        - *powerMultiplier
+        - *powerDivisor
+        - *harmonicCurrentMultiplier
+        - *phaseHarmonicCurrentMultiplier
+        - *lineCurrent
+        - *activeCurrent
+        - *reactiveCurrent
+        - *rmsVoltage
+        - *rmsVoltageMin
+        - *rmsVoltageMax
+        - *rmsCurrent
+        - *rmsCurrentMin
+        - *rmsCurrentMax
+        - *activePower
+        - *activePowerMin
+        - *activePowerMax
+        - *reactivePower
+        - *apparentPower
+        - *powerFactor
+        - *averageRMSVoltageMeasurementPeriod
+        - *averageRMSOverVoltageCounter
+        - *averageRMSUnderVoltageCounter
+        - *rmsExtremeOverVoltagePeriod
+        - *rmsExtremeUnderVoltagePeriod
+        - *rmsVoltageSagPeriod
+        - *rmsVoltageSwellPeriod
+        - *acVoltageMultiplier
+        - *acVoltageDivisor
+        - *acCurrentMultiplier
+        - *acCurrentDivisor
+        - *acPowerMultiplier
+        - *acPowerDivisor
+        - *dcOverloadAlarmsMask
+        - *dcVoltageOverload
+        - *dcCurrentOverload
+        - *acAlarmsMask
+        - *acVoltageOverload
+        - *acCurrentOverload
+        - *acActivePowerOverload
+        - *acReactivePowerOverload
+        - *averageRMSOverVoltage
+        - *averageRMSUnderVoltage
+        - *rmsExtremeOverVoltage
+        - *rmsExtremeUnderVoltage
+        - *rmsVoltageSag
+        - *rmsVoltageSwell
+        - *lineCurrentPhB
+        - *activeCurrentPhB
+        - *reactiveCurrentPhB
+        - *rmsVoltagePhB
+        - *rmsVoltageMinPhB
+        - *rmsVoltageMaxPhB
+        - *rmsCurrentPhB
+        - *rmsCurrentMinPhB
+        - *rmsCurrentMaxPhB
+        - *activePowerPhB
+        - *activePowerMinPhB
+        - *activePowerMaxPhB
+        - *reactivePowerPhB
+        - *apparentPowerPhB
+        - *powerFactorPhB
+        - *averageRMSVoltageMeasurementPeriodPhB
+        - *averageRMSOverVoltageCounterPhB
+        - *averageRMSUnderVoltageCounterPhB
+        - *rmsExtremeOverVoltagePeriodPhB
+        - *rmsExtremeUnderVoltagePeriodPhB
+        - *rmsVoltageSagPeriodPhB
+        - *rmsVoltageSwellPeriodPhB
+        - *lineCurrentPhC
+        - *activeCurrentPhC
+        - *reactiveCurrentPhC
+        - *rmsVoltagePhC
+        - *rmsVoltageMinPhC
+        - *rmsVoltageMaxPhC
+        - *rmsCurrentPhC
+        - *rmsCurrentMinPhC
+        - *rmsCurrentMaxPhC
+        - *activePowerPhC
+        - *activePowerMinPhC
+        - *activePowerMaxPhC
+        - *reactivePowerPhC
+        - *apparentPowerPhC
+        - *powerFactorPhC
+        - *averageRMSVoltageMeasurementPeriodPhC
+        - *averageRMSOverVoltageCounterPhC
+        - *averageRMSUnderVoltageCounterPhC
+        - *rmsExtremeOverVoltagePeriodPhC
+        - *rmsExtremeUnderVoltagePeriodPhC
+        - *rmsVoltageSagPeriodPhC
+        - *rmsVoltageSwellPeriodPhC
+
