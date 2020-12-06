@@ -86,7 +86,7 @@ jobs:
           git add .
           git commit -m "Update to zyaml ${GITHUB_SHA}" -m "See https://github.com/hemtjanst/zyaml/commit/${GITHUB_SHA}"
           git push origin zyaml-${GITHUB_SHA}
-          hub pull-request -m "Update ZCL to zyaml ${GITHUB_SHA}" --reviewer daenney,bonan
+          hub pull-request -m "Update to zyaml ${GITHUB_SHA}" -m "See hemtjanst/zyaml@${GITHUB_SHA}" --reviewer daenney,bonan
         else
           echo "No changes to generated code"
         fi
