@@ -15,19 +15,17 @@ types:
     access: r
     default: "0xffffffff"
     showas: hex
-  CurrentFileVersion: &currentFileVersion
-    id: "0x0002"
-    name: Current File Version
-    type: u32
-    access: r
-    default: "0xffffffff"
-    showas: hex
-  NewFileVersion: &newFileVersion
-    name: New File Version
+  FileVersion: &fileVersion
+    name: File Version
     type: u32
     access: rw
     default: "0xffffffff"
     showas: hex
+  CurrentFileVersion: &currentFileVersion
+    <<: *fileVersion
+    id: "0x0002"
+    name: Current File Version
+    access: r
   ImageNotifyPayloadType: &imageNotifyPayloadType
     name: Image Notify Payload Type
     type: enum8
@@ -52,12 +50,10 @@ types:
     default: "0xffff"
     showas: hex
   DownloadedFileVersion: &downloadedFileVersion
+    <<: *fileVersion
     id: "0x0004"
     name: Downloaded File Version
-    type: u32
     access: r
-    default: "0xffffffff"
-    showas: hex
   DownloadedStackVersion: &downloadedStackVersion
     id: "0x0005"
     name: Downloaded Stack Version
@@ -107,31 +103,17 @@ types:
     type: enum16
     required: true
     showas: hex
+    values:
+      "0x117C": Ikea
   ImageType: &imageType
     name: Image type
-    type: enum16
+    type: u16
     values:
       "0x0000": Specific image
       "0xFFC0": Security credential
       "0xFFC1": Configuration
       "0xFFC2": Log
       "0xFFFF": Wild card
-  ApplicationRelease: &applicationRelease
-    name: Application Release
-    type: u8
-    showas: hex
-  ApplicationBuild: &applicationBuild
-    name: Application Build
-    type: u8
-    showas: hex
-  StackRelease: &stackRelease
-    name: Stack Release
-    type: u8
-    showas: hex
-  StackBuild: &stackBuild
-    name: Stack Build
-    type: u8
-    showas: hex
 
   NextImageStatus: &nextImageStatus
     name: Next Image Status
@@ -153,7 +135,14 @@ types:
     type: enum8
     values:
       "0x00": Success
+      "0x7E": Not Authorized
+      "0x80": Malformed Command
+      "0x81": Unsupported Command
+      "0x95": Abort
+      "0x96": Invalid Image
       "0x97": Wait for data
+      "0x98": No Image Available
+      "0x99": Require More Image
     .tpl_success: &__cond_success
       name: Status
       value: "0x00"
@@ -194,10 +183,7 @@ clusters:
             - *hardwareVersionPresent
             - *manufacturerCode
             - *imageType
-            - *applicationRelease
-            - *applicationBuild
-            - *stackRelease
-            - *stackBuild
+            - *fileVersion
             - <<: *hardwareVersion
               cond:
                 - *__cond_hardware_version_present
@@ -210,13 +196,20 @@ clusters:
             - *blockRequestOptions
             - *manufacturerCode
             - *imageType
-            - *applicationRelease
-            - *applicationBuild
-            - *stackRelease
-            - *stackBuild
+            - *fileVersion
             - *fileOffset
             - <<: *dataSize
               argname: Max Data Size
+        - id: "0x06"
+          name: Upgrade End Request
+          response: "0x07"
+          dir: send
+          required: m
+          payloadattr:
+            - *status
+            - *manufacturerCode
+            - *imageType
+            - *fileVersion
 
     client:
       attr:
@@ -246,7 +239,7 @@ clusters:
                 - name: Image Notify Payload Type
                   value: 0x02
                   operator: ">="
-            - <<: *newFileVersion
+            - <<: *fileVersion
               cond:
                 - name: Image Notify Payload Type
                   value: 0x03
@@ -256,24 +249,14 @@ clusters:
           dir: recv
           required: m
           payloadattr:
-            - <<: *nextImageStatus
-              argname: Status
+            - <<: *status
             - <<: *manufacturerCode
               cond:
                 - *__cond_success
             - <<: *imageType
               cond:
                 - *__cond_success
-            - <<: *applicationRelease
-              cond:
-                - *__cond_success
-            - <<: *applicationBuild
-              cond:
-                - *__cond_success
-            - <<: *stackRelease
-              cond:
-                - *__cond_success
-            - <<: *stackBuild
+            - <<: *fileVersion
               cond:
                 - *__cond_success
             - <<: *imageSize
@@ -286,42 +269,34 @@ clusters:
           required: m
           payloadattr:
             - *status
-            - *manufacturerCode
-            - *imageType
-            - *applicationRelease
-            - *applicationBuild
-            - *stackRelease
-            - *stackBuild
-            - *fileOffset
-            - *payload
-      .cmd:
+            - <<: *manufacturerCode
+              cond:
+                - *__cond_success
+            - <<: *imageType
+              cond:
+                - *__cond_success
+            - <<: *fileVersion
+              cond:
+                - *__cond_success
+            - <<: *fileOffset
+              cond:
+                - *__cond_success
+            - <<: *payload
+              cond:
+                - *__cond_success
+            - <<: *currentTime
+              cond:
+                - *__cond_wait_for_data
+            - <<: *requestTime
+              cond:
+                - *__cond_wait_for_data
         - id: "0x07"
-          name: Upgrade end response
+          name: Upgrade End Response
           dir: recv
           required: m
           payloadattr:
-            - id: "0x0000"
-              name: Manufacturer ID
-              type: u16
-              required: true
-              showas: hex
-            - id: "0x0001"
-              name: Image type
-              type: u16
-              required: true
-              showas: hex
-            - id: "0x0002"
-              name: File version
-              type: u32
-              required: true
-              showas: hex
-            - id: "0x0003"
-              name: Current time
-              type: u32
-              required: true
-              showas: hex
-            - id: "0x0004"
-              name: Upgrade time
-              type: u32
-              required: true
-              showas: hex
+            - *manufacturerCode
+            - *imageType
+            - *fileVersion
+            - *currentTime
+            - *requestTime
