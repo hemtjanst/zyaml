@@ -92,6 +92,7 @@ types:
     type: u16
     values:
       0x0104: Home Automation
+      0xA1E0: Green Power
       0xC05E: Light Link
   clusterId: &clusterId
     name: Cluster ID
