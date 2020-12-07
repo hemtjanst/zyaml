@@ -1,0 +1,316 @@
+---
+name: Green Power
+types:
+
+  MaxSinkTableEntries: &maxSinkTableEntries
+    name: Max Sink Table Entries
+    description: that can be stored in GPS
+    id: "0x0000"
+    type: u8
+    access: r
+    default: "5"
+    required: true
+  # Sink table -- see page 89
+  # https://zigbeealliance.org/wp-content/uploads/2019/11/docs-09-5499-26-batt-zigbee-green-power-specification.pdf
+  SinkTable: &sinkTable
+    name: Sink Table
+    description: contains the pairings configured for this GPS
+    id: "0x0001"
+    type: lostring # change to local struct
+    access: r
+    required: true
+  CommunicationMode: &communicationMode
+    name: Communication Mode
+    id: "0x0002"
+    type: enum8
+    access: rw
+    default: "1"
+    required: true
+    values:
+      "0x00": Full Unicast
+      "0x01": Groupcast
+      "0x02": Pre-commissioned Groupcast
+      "0x03": Lightweight Unicast
+  CommissioningExitMode: &commissioningExitMode
+    name: Commissioning Exit Mode
+    description: controls when GPS exits commissioning mode
+    id: "0x0003"
+    type: bmp8
+    access: rw
+    default: "2"
+    required: true
+    bits:
+      "0": On expiration
+      "1": On pairing success
+      "2": On exit command
+  CommissioningWindow: &commissioningWindow
+    name: Commissioning Window
+    id: "0x0004"
+    type: u16
+    unit: Seconds
+    access: rw
+    default: "5"
+    required: false
+  SecurityLevel: &securityLevel
+    name: Security Level
+    id: "0x0005"
+    type: enum8
+    access: rw
+    default: "1"
+    required: true
+    values:
+      "0x00": No security
+      "0x01": LSB of frame counter and short MIC # Least significant byte, 2B MIC
+      "0x02": Full frame counter and long MIC # 4B MIC
+      "0x03": Encryption, Full frame counter and long MIC # 4B MIC
+  Functionality: &functionality
+    name: Functionality
+    id: "0x0006"
+    type: bmp24
+    access: r
+    required: true
+    bits: &functionalityBits
+      "0": GP Feature
+      "1": Direct Communication
+      "2": Derived Groupcast communication
+      "3": Pre-commissioned Groupcast communication
+      "4": Unicast communication
+      "5": Lightweight unicast communication
+      "6": Single-hop bidirectional operation
+      "7": Multi-hop bidirectional operation
+      "8": Proxy table maintenance
+      "9": Single-hop commissioning
+      "10": Multi-hop commissioning
+      "11": CT-based commissioning
+      "12": Maintenance of GPD
+      "13": Security Support - No security
+      "14": Security Support - LSB of frame counter and short MIC # Least significant byte, 2B MIC
+      "15": Security Support - Full frame counter and long MIC # 4B MIC
+      "16": Security Support - Encryption, Full frame counter and long MIC # 4B MIC
+      "17": Sink table-based groupcast forwarding
+      "18": Translation table
+      "19": GPD IEEE Address
+  ActiveFunctionality: &activeFunctionality
+    name: Active Functionality
+    id: "0x0007"
+    type: bmp24
+    access: r
+    default: "0xffffff"
+    required: true
+    bits: *functionalityBits
+
+  SharedSecurityKeyType: &sharedSecurityKeyType
+    name: Shared Security Key Type
+    id: "0x0020"
+    type: enum8
+    range: "0x00,0x08"
+    access: rw
+    default: "3"
+    required: false
+    values:
+      "0x00": No key
+      "0x01": NWK key
+      "0x02": GP Group key
+      "0x03": NWK-key derived GP group key
+      "0x07": Dervied Individual GPD key
+  SharedSecurityKey: &sharedSecurityKey
+    name: Shared Security Key
+    id: "0x0021"
+    type: seckey
+    access: rw
+    required: false
+  LinkKey: &linkKey
+    name: Link Key
+    id: "0x0022"
+    type: seckey
+    access: rw
+    required: false
+    default: "ZigBeeAlliance09"
+
+
+  PairingOptions: &pairingOptions
+    name: Pairing options
+    type: u24 #bmp24?
+  ieee: &ieee
+    name: IEEE Address
+    description: is a 64-bit MAC address
+    type: uid
+  nwk: &nwk
+    name: NWK Address
+    description: is a 16-bit Network address
+    showas: hex
+    type: u16
+  SourceId: &sourceId
+    name: Source id
+    type: u32
+  GroupId: &groupId
+    name: Group id
+    type: u16
+  DeviceId: &deviceId
+    name: Device id
+    type: enum8
+    values:
+      "0x00": "One State Switch"
+      "0x01": "Two State Switch"
+      "0x02": "On/Off Switch"
+      "0x03": "Level Control Switch"
+      "0x04": "Sensor"
+      "0x05": "Advanced One State Switch"
+      "0x06": "Advanced Two State Switch"
+  FrameCounter: &frameCounter
+    name: Frame counter
+    type: u32
+  Key: &key
+    name: Key
+    type: seckey # 128 bit key
+  CommissioningOptions: &commissioningOptions
+    name: Commissioning Options
+    type: enum8 #bmp8?
+    values:
+      "0x00": "Exit"
+      "0x01": "Enter"
+  NotificationOptions: &notificationOptions
+    name: Notification Options
+    type: bmp16 #bmp16?
+    bits:
+      "1": IEEE Address
+      "3": Also unicast
+      "4": Also derived group
+      "5": Also commissioned group
+      # should be combined to get 2 bit security level
+      "6": Security Level 1
+      "7": Security Level 2
+      # should be combined to get 3 bit security type
+      "8": Security key type 1
+      "9": Security key type 2
+      "10": Security key type 3
+      "11": Appoint Temp Master
+      "12": Proxy TX Queue Full
+  CommissioningNotificationOptions: &commissioningNotificationOptions
+    name: Commissioning Notification Options
+    type: bmp16 #bmp16?
+    bits:
+      "1": IEEE Address
+      "3": Appoint Temp Master
+      # should be combined to get 2 bit security level
+      "4": Security Level 1
+      "5": Security Level 2
+      # should be combined to get 3 bit security type
+      "6": Security key type 1
+      "7": Security key type 2
+      "8": Security key type 3
+      "9": Security processing failed
+  CommandId: &commandId
+    name: Command id
+    type: enum8
+    values:
+      "0x00": "Identify"
+      "0x20": "Off"
+      "0x21": "On"
+      "0x22": "Toggle"
+      "0x34": "Level control stop"
+      "0x35": "Move up with on/off"
+      "0x36": "Move down with on/off"
+      "0x37": "Step up with on/off"
+      "0x38": "Step down with on/off"
+      "0xE0": "Commissioning"
+      "0xE1": "Decommissioning"
+      "0xE2": "Success"
+      "0xE3": "Channel Request"
+      "0xF0": "Commissioning Reply"
+      "0xF3": "Channel Configuration"
+  PayloadLength: &payloadLength
+    name: Payload length
+    type: u8
+  CommandFrame: &commandFrame
+    name: Command frame
+    type: bytes
+
+clusters:
+  - id: "0x0021"
+    name: Green Power
+    server:
+      attr:
+        - *maxSinkTableEntries
+        - *sinkTable
+        - *communicationMode
+        - *commissioningExitMode
+        - *commissioningWindow
+        - *securityLevel
+        - *functionality
+        - *activeFunctionality
+        # Shared attributes
+        - *sharedSecurityKeyType
+        - *sharedSecurityKey
+        - *linkKey
+      cmd:
+        - id: "0x01"
+          name: Pairing Search
+          dir: send
+          required: m
+          payloadattr:
+            - *pairingOptions
+            - *sourceId
+            - *groupId
+            - *deviceId
+            - *frameCounter
+            - *key
+        - id: "0x03"
+          name: Commissioning Mode
+          response: "0x02"
+          dir: send
+          required: m
+          payloadattr:
+            - *commissioningOptions
+            - *commissioningWindow
+
+    client:
+      attr:
+        # Shared attributes
+        - *sharedSecurityKeyType
+        - *sharedSecurityKey
+        - *linkKey
+        # Client attributes
+        -
+      cmd:
+        - id: "0x00"
+          name: Notification
+          dir: recv
+          required: o
+          payloadattr:
+            - *notificationOptions
+            - <<: *nwk
+              cond:
+                - name: Notification Options
+                  value: "0x00" # TODO: This will not work? Add bitmap checking to Condition
+                  mask: "0x02"
+            - <<: *ieee
+              cond:
+                - name: Notification Options
+                  value: "0x02"
+                  mask: "0x02"
+            - *frameCounter
+            - *commandId
+            - *payloadLength
+            - *commandFrame
+
+        - id: "0x04"
+          name: Commissioning Notification
+          dir: recv
+          required: m
+          payloadattr:
+            - *commissioningNotificationOptions
+            - <<: *nwk
+              cond:
+                - name: Commissioning Notification Options
+                  value: "0x00" # TODO: This will not work? Add bitmap checking to Condition
+                  mask: "0x02"
+            - <<: *ieee
+              cond:
+                - name: Commissioning Notification Options
+                  value: "0x02"
+                  mask: "0x02"
+            - *frameCounter
+            - *commandId
+            - *payloadLength
+            - *commandFrame
