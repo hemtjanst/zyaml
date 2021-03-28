@@ -48,11 +48,13 @@ types:
     id: "0x0003"
     name: Lift - Current Position
     access: r
+    report: true
   TiltCurrentPosition: &tiltCurrentPosition
     <<: *position
     id: "0x0004"
     name: Tilt - Current Position
     access: r
+    report: true
   LiftNumberOfActuations: &liftNumberOfActuations
     id: "0x0005"
     name: Lift - Number of Actuations
@@ -84,11 +86,13 @@ types:
     id: "0x0008"
     name: Lift Current Position Percentage
     access: r
+    report: true
   TiltCurrentPositionPercentage: &tiltCurrentPositionPercentage
     <<: *percentage
     id: "0x0009"
     name: Tilt Current Position Percentage
     access: r
+    report: true
   LiftInstalledOpenLimit: &liftInstalledOpenLimit
     <<: *position
     id: "0x0010"
