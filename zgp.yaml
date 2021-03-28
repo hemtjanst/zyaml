@@ -1,0 +1,400 @@
+---
+
+types:
+  DeviceId: &deviceId
+    name: Device ID
+    type: enum8
+    values:
+      "0x00": Simple Generic 1-state Switch
+      "0x01": Simple Generic 2-state Switch
+      "0x02": On/Off Switch
+      "0x03": Level Control Switch
+      "0x04": Simple Sensor
+      "0x05": Advanced Generic 1-state Switch
+      "0x06": Advanced Generic 2-state Switch
+      "0x10": Color Dimmer Switch
+      "0x11": Light Sensor
+      "0x12": Occupancy Sensor
+      "0x20": Door Lock Controller
+      "0x30": Temperature Sensor
+      "0x31": Pressure Sensor
+      "0x32": Flow Sensor
+      "0x33": Indoor Environment Sensor
+
+  CommissioningOptions: &commissioningOptions
+    name: Commissioning Options
+    type: bmp8
+    bits:
+      "0": Seq Number Cap
+      "1": Rx On Cap
+      "4": Pan ID Request
+      "5": GPD Security Key Request
+      "6": Fixed Location
+      "7": Extended Options
+  ExtendedCommissioningOptions: &extendedCommissioningOptions
+    name: Extended Commissioning Options
+    type: bmp8
+    bits:
+      "0..1": Security Level
+      "2..4": Key Type
+      "5": GPD Key Present
+      "6": GPD Key Encryption
+      "7": GPD Outgoing Counter Present
+  GpdKey: &gpdKey
+    name: GPD Key
+    type: seckey
+  GpdKeyMic: &gpdKeyMic
+    name: GPD Key MIC
+    type: u32
+  GpdOutgoingCounter: &gpdOutgoingCounter
+    name: GPD Outgoing Counter
+    type: u32
+
+commands:
+  - name: Identify
+    id: "0x00"
+    description: |
+      requests a device to identify itself (usually by blinking a led)
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Identify
+        command: Identify
+        payloadattr:
+          - name: Identify Time
+            value: 60
+  - name: Scene 0
+    id: "0x10"
+    description: requests a device to switch to scene 0
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 0
+  - name: Scene 1
+    id: "0x11"
+    description: requests a device to switch to scene 1
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 1
+  - name: Scene 2
+    id: "0x12"
+    description: requests a device to switch to scene 2
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 2
+  - name: Scene 3
+    id: "0x13"
+    description: requests a device to switch to scene 3
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 3
+  - name: Scene 4
+    id: "0x14"
+    description: requests a device to switch to scene 4
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 4
+  - name: Scene 5
+    id: "0x15"
+    description: requests a device to switch to scene 5
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 5
+  - name: Scene 6
+    id: "0x16"
+    description: requests a device to switch to scene 6
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 6
+  - name: Scene 7
+    id: "0x17"
+    description: requests a device to switch to scene 7
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 7
+  - name: Scene 8
+    id: "0x18"
+    description: requests a device to switch to scene 8
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 8
+  - name: Scene 9
+    id: "0x19"
+    description: requests a device to switch to scene 9
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 9
+  - name: Scene 10
+    id: "0x1a"
+    description: requests a device to switch to scene 1
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 10
+  - name: Scene 11
+    id: "0x1b"
+    description: requests a device to switch to scene 11
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 11
+  - name: Scene 12
+    id: "0x1c"
+    description: requests a device to switch to scene 12
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 12
+  - name: Scene 13
+    id: "0x1d"
+    description: requests a device to switch to scene 13
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 13
+  - name: Scene 14
+    id: "0x1e"
+    description: requests a device to switch to scene 14
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 14
+  - name: Scene 15
+    id: "0x1f"
+    description: requests a device to switch to scene 15
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Scenes
+        command: View Scene
+        payloadattr:
+          - name: Scene ID
+            value: 15
+  - name: Off
+    id: "0x20"
+    description: |
+      requests a device to turn off
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: On/Off
+        command: Off
+  - name: On
+    id: "0x21"
+    description: |
+      requests a device to turn on
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: On/Off
+        command: On
+  - name: Toggle
+    id: "0x22"
+    description: |
+      requests a device to turn toggle
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: On/Off
+        command: Toggle
+  - name: Release
+    id: "0x23"
+    payloadattr: []
+
+  #      "0x30": "Move up"
+  #      "0x31": "Move down"
+  #      "0x32": "Step up"
+  #      "0x33": "Step down"
+
+  - name: Level Control Stop
+    id: "0x34"
+    payloadattr: []
+    bind:
+      - package: general
+        cluster: Level Control
+        command: Stop
+
+  #      "0x35": "Move up with on/off"
+  #      "0x36": "Move down with on/off"
+  #      "0x37": "Step up with on/off"
+  #      "0x38": "Step down with on/off"
+
+  - name: Move Hue Stop
+    id: "0x40"
+    payloadattr: []
+    bind:
+      - package: lighting
+        cluster: Color Control
+        command: Move Hue
+        payloadattr:
+          - name: Move Mode
+            value: 0 # stop
+
+  #      "0x40": "Move hue stop"
+  #      "0x41": "Move hue up"
+  #      "0x42": "Move hue down"
+  #      "0x43": "Step hue up"
+  #      "0x44": "Step hue down"
+
+  - name: Move Saturation Stop
+    id: "0x45"
+    payloadattr: []
+    bind:
+      - package: lighting
+        cluster: Color Control
+        command: Move Saturation
+        payloadattr:
+          - name: Move Mode
+            value: 0 # stop
+
+  #      "0x45": "Move saturation stop"
+  #      "0x46": "Move saturation up"
+  #      "0x47": "Move saturation down"
+  #      "0x48": "Step saturation up"
+  #      "0x49": "Step saturation down"
+  #      "0x4A": "Move color"
+  #      "0x4B": "Step color"
+
+  - name: Lock Door
+    id: "0x50"
+    payloadattr: []
+    __bind: # TODO not implemented yet
+      - package: closures
+        cluster: Door Lock
+        command: Lock Door
+
+  - name: Unlock Door
+    id: "0x51"
+    payloadattr: []
+    __bind: # TODO not implemented yet
+      - package: closures
+        cluster: Door Lock
+        command: Unlock Door
+
+  - name: Press 1 of 1
+    id: "0x60"
+  - name: Release 1 of 1
+    id: "0x61"
+  - name: Press 1 of 2
+    id: "0x62"
+  - name: Release 1 of 2
+    id: "0x63"
+  - name: Press 2 of 2
+    id: "0x64"
+  - name: Release 2 of 2
+    id: "0x65"
+  - name: Short press 1 of 1
+    id: "0x66"
+  - name: Short press 1 of 2
+    id: "0x67"
+  - name: Short press 2 of 2
+    id: "0x68"
+
+  #      "0xA0": "Attribute reporting"
+  #      "0xA1": "Custom Attribute reporting"
+  #      "0xA2": "Multi-cluster reporting"
+  #      "0xA3": "Custom multi-cluster reporting"
+  #      "0xA4": "Request attributes"
+  #      "0xA5": "Read attributes response"
+  #      "0xAF": "Sensor command"
+  #      "0xE0": "Commissioning"
+  - name: Commissioning
+    id: "0xE0"
+    payloadattr:
+      - *deviceId
+      - *commissioningOptions
+      - <<: *extendedCommissioningOptions
+        cond:
+          - name: Commissioning Options
+            bit: Extended Options
+      - <<: *gpdKey
+        type: seckey
+        cond:
+          - name: Extended Commissioning Options
+            bit: GPD Key Present
+      - <<: *gpdKeyMic
+        cond:
+          - name: Extended Commissioning Options
+            bit: GPD Key Present
+          - name: Extended Commissioning Options
+            bit: GPD Key Encryption
+      - <<: *gpdOutgoingCounter
+        cond:
+          - name: Extended Commissioning Options
+            bit: GPD Outgoing Counter Present
+  #      "0xE1": "Decommissioning"
+  #      "0xE2": "Success"
+  #      "0xE3": "Channel request"
+  #      "0xF0": "Commissioning reply"
+  #      "0xF1": "Write attributes"
+  #      "0xF2": "Read attributes"
+  #      "0xF3": "Channel configuration"

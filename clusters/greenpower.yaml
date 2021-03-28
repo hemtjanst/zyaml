@@ -131,15 +131,10 @@ types:
   PairingOptions: &pairingOptions
     name: Pairing options
     type: u24 #bmp24?
-  ieee: &ieee
+  IeeeAddress: &ieee
     name: IEEE Address
     description: is a 64-bit MAC address
     type: uid
-  nwk: &nwk
-    name: NWK Address
-    description: is a 16-bit Network address
-    showas: hex
-    type: u16
   SourceId: &sourceId
     name: Source id
     type: u32
@@ -165,10 +160,13 @@ types:
     type: seckey # 128 bit key
   CommissioningOptions: &commissioningOptions
     name: Commissioning Options
-    type: enum8 #bmp8?
-    values:
-      "0x00": "Exit"
-      "0x01": "Enter"
+    type: bmp8
+    bits:
+      "0": "Enter"
+      "1": "Exit on expire"
+      "2": "Exit on pairing"
+      "3": "Exit on command"
+      "4": "Unicast"
   NotificationOptions: &notificationOptions
     name: Notification Options
     type: bmp16 #bmp16?
@@ -188,46 +186,119 @@ types:
       "12": Proxy TX Queue Full
   CommissioningNotificationOptions: &commissioningNotificationOptions
     name: Commissioning Notification Options
-    type: bmp16 #bmp16?
+    type: bmp16
+    # listed as enum16, but easier to read as bmp16
+    # this means the endianness is wrong - so bit 0 = 8 and 8 = 0
     bits:
-      "1": IEEE Address
-      "3": Appoint Temp Master
+      "1": Security processing failed
+      "2": Bidirectional
+      "3": Proxy Info Present
+
+      "9": IEEE Address
+      "11": Rx After Tx
       # should be combined to get 2 bit security level
-      "4": Security Level 1
-      "5": Security Level 2
+      "12": Security Level Bit1
+      "13": Security Level Bit2
+      #"12..13": Security Level
       # should be combined to get 3 bit security type
-      "6": Security key type 1
-      "7": Security key type 2
-      "8": Security key type 3
-      "9": Security processing failed
+      "0": Security Key Bit1
+      "14": Security Key Bit2
+      "15": Security Key Bit3
+      #"0,14..15": Security key
+  ProxyShortAddress: &proxyShortAddress
+    name: Proxy Short Address
+    type: u16
+  ProxyLinkQuality: &proxyLinkQuality
+    name: Proxy Link Quality
+    type: u8
+    description: upper 2 bits contains signal strength (00=Poor, 01=Moderate, 10=High, 11=Excellent), lower 6 bits contains RSSI
+  Mic: &mic
+    name: Mic
+    description: Is used for security verification
+    type: u32
+
   CommandId: &commandId
     name: Command id
     type: enum8
     values:
       "0x00": "Identify"
+      "0x10": "Scene 0"
+      "0x11": "Scene 1"
+      "0x12": "Scene 2"
+      "0x13": "Scene 3"
+      "0x14": "Scene 4"
+      "0x15": "Scene 5"
+      "0x16": "Scene 6"
+      "0x17": "Scene 7"
+      "0x18": "Scene 8"
+      "0x19": "Scene 9"
+      "0x1a": "Scene 10"
+      "0x1b": "Scene 11"
+      "0x1c": "Scene 12"
+      "0x1d": "Scene 13"
+      "0x1e": "Scene 14"
+      "0x1f": "Scene 15"
       "0x20": "Off"
       "0x21": "On"
       "0x22": "Toggle"
+      "0x23": "Release"
+      "0x30": "Move up"
+      "0x31": "Move down"
+      "0x32": "Step up"
+      "0x33": "Step down"
       "0x34": "Level control stop"
       "0x35": "Move up with on/off"
       "0x36": "Move down with on/off"
       "0x37": "Step up with on/off"
       "0x38": "Step down with on/off"
+      "0x40": "Move hue stop"
+      "0x41": "Move hue up"
+      "0x42": "Move hue down"
+      "0x43": "Step hue up"
+      "0x44": "Step hue down"
+      "0x45": "Move saturation stop"
+      "0x46": "Move saturation up"
+      "0x47": "Move saturation down"
+      "0x48": "Step saturation up"
+      "0x49": "Step saturation down"
+      "0x4A": "Move color"
+      "0x4B": "Step color"
+      "0x50": "Lock door"
+      "0x51": "Unlock door"
+      "0x60": "Press 1 of 1"
+      "0x61": "Release 1 of 1"
+      "0x62": "Press 1 of 2"
+      "0x63": "Release 1 of 2"
+      "0x64": "Press 2 of 2"
+      "0x65": "Release 2 of 2"
+      "0x66": "Short press 1 of 1"
+      "0x67": "Short press 1 of 2"
+      "0x68": "Short press 2 of 2"
+      "0xA0": "Attribute reporting"
+      "0xA1": "Custom Attribute reporting"
+      "0xA2": "Multi-cluster reporting"
+      "0xA3": "Custom multi-cluster reporting"
+      "0xA4": "Request attributes"
+      "0xA5": "Read attributes response"
+      "0xAF": "Sensor command"
       "0xE0": "Commissioning"
       "0xE1": "Decommissioning"
       "0xE2": "Success"
-      "0xE3": "Channel Request"
-      "0xF0": "Commissioning Reply"
-      "0xF3": "Channel Configuration"
+      "0xE3": "Channel request"
+      "0xF0": "Commissioning reply"
+      "0xF1": "Write attributes"
+      "0xF2": "Read attributes"
+      "0xF3": "Channel configuration"
   PayloadLength: &payloadLength
     name: Payload length
     type: u8
   CommandFrame: &commandFrame
     name: Command frame
-    type: bytes
+    type: ostring
 
 clusters:
   - id: "0x0021"
+    profile: "0xa1e0"
     name: Green Power
     server:
       attr:
@@ -244,51 +315,21 @@ clusters:
         - *sharedSecurityKey
         - *linkKey
       cmd:
-        - id: "0x01"
-          name: Pairing Search
-          dir: send
-          required: m
-          payloadattr:
-            - *pairingOptions
-            - *sourceId
-            - *groupId
-            - *deviceId
-            - *frameCounter
-            - *key
-        - id: "0x03"
-          name: Commissioning Mode
-          response: "0x02"
-          dir: send
-          required: m
-          payloadattr:
-            - *commissioningOptions
-            - *commissioningWindow
-
-    client:
-      attr:
-        # Shared attributes
-        - *sharedSecurityKeyType
-        - *sharedSecurityKey
-        - *linkKey
-        # Client attributes
-        -
-      cmd:
         - id: "0x00"
           name: Notification
           dir: recv
           required: o
           payloadattr:
             - *notificationOptions
-            - <<: *nwk
+            - <<: *sourceId
               cond:
                 - name: Notification Options
-                  value: "0x00" # TODO: This will not work? Add bitmap checking to Condition
-                  mask: "0x02"
+                  bit: IEEE Address
+                  invert: true
             - <<: *ieee
               cond:
                 - name: Notification Options
-                  value: "0x02"
-                  mask: "0x02"
+                  bit: IEEE Address
             - *frameCounter
             - *commandId
             - *payloadLength
@@ -300,17 +341,57 @@ clusters:
           required: m
           payloadattr:
             - *commissioningNotificationOptions
-            - <<: *nwk
+            - <<: *sourceId
               cond:
                 - name: Commissioning Notification Options
-                  value: "0x00" # TODO: This will not work? Add bitmap checking to Condition
-                  mask: "0x02"
+                  bit: IEEE Address
+                  invert: true
             - <<: *ieee
               cond:
                 - name: Commissioning Notification Options
-                  value: "0x02"
-                  mask: "0x02"
+                  bit: IEEE Address
             - *frameCounter
             - *commandId
-            - *payloadLength
             - *commandFrame
+            - <<: *proxyShortAddress
+              cond:
+                - name: Commissioning Notification Options
+                  bit: Proxy Info Present
+            - <<: *proxyLinkQuality
+              cond:
+                - name: Commissioning Notification Options
+                  bit: Proxy Info Present
+            - *mic
+
+    client:
+      attr:
+        # Shared attributes
+        - *sharedSecurityKeyType
+        - *sharedSecurityKey
+        - *linkKey
+        # Client attributes
+      cmd:
+
+        - id: "0x01"
+          name: Pairing
+          dir: send
+          required: m
+          payloadattr:
+            - *pairingOptions
+            - *sourceId
+            - *groupId
+            - *deviceId
+            - *frameCounter
+            - *key
+        - id: "0x02"
+          name: Commissioning Mode
+          dir: send
+          required: m
+          payloadattr:
+            - *commissioningOptions
+            - <<: *commissioningWindow
+              cond:
+                - name: "Commissioning Options"
+                  bit: "Enter"
+                - name: "Commissioning Options"
+                  bit: "Exit on expire"
