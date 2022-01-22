@@ -8,6 +8,7 @@ manufacturer: &manufacturer
   0x115F: Xiaomi
   0x1166: innr
   0x117C: Ikea
+  0x1189: Ledvance
   0x1241: Samjin
 
 templates:
