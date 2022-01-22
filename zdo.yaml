@@ -7,6 +7,8 @@ manufacturer: &manufacturer
   0x115F: Xiaomi
   0x1037: NXP
   0x1166: innr
+  0x1241: Samjin
+  0x105E: Schneider Electric
 
 templates:
   condSuccess: &__cond_success
