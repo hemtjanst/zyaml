@@ -11,6 +11,7 @@ types:
     type: enum8
     default: "0x00"
     required: true
+    report: true
     values:
       "0x00": Not Enrolled
       "0x01": Enrolled
@@ -42,17 +43,18 @@ types:
     type: bmp16
     default: "0x00"
     required: true
+    report: true
     bits:
-      "0": Alarm1
-      "1": Alarm2
-      "2": Tamper
-      "3": Battery
-      "4": Supervision notify
-      "5": Restore notify
-      "6": Trouble
-      "7": AC (mains)
-      "8": Test
-      "9": Battery defect
+      "0": Test
+      "1": Battery defect
+      "8": Alarm1
+      "9": Alarm2
+      "10": Tamper
+      "11": Battery
+      "12": Supervision notify
+      "13": Restore notify
+      "14": Trouble
+      "15": AC (mains)
   IasCieAddressMac: &iasCIEAddress
     id: "0x0010"
     name: IAS CIE Address (MAC)
@@ -120,8 +122,25 @@ clusters:
         - *currentZoneSensitivityLevel
       cmd:
         - id: "0x00"
+          name: Zone Enroll Response
+          dir: recv
+          payloadattr:
+            - *enrollResponseCode
+            - *zoneID
+        - id: "0x01"
+          name: Initiate Normal Operation Mode
+          dir: recv
+        - id: "0x02"
+          name: Initiate Test Mode
+          dir: recv
+          payloadattr:
+            - *testModeDuration
+            - *currentZoneSensitivityLevel
+    client:
+      cmd:
+        - id: "0x00"
           name: Zone State Change Notification
-          dir: send
+          dir: recv
           payloadattr:
             - *zoneStatus
             - *extendedStatus
@@ -129,25 +148,8 @@ clusters:
             - *delay
         - id: "0x01"
           name: Zone Enroll Request
-          dir: send
+          dir: recv
           response: "0x00"
           payloadattr:
             - *zoneType
             - *manufacturerCode
-    client:
-      cmd:
-        - id: "0x00"
-          name: Zone Enroll Response
-          dir: send
-          payloadattr:
-            - *enrollResponseCode
-            - *zoneID
-        - id: "0x01"
-          name: Initiate Normal Operation Mode
-          dir: send
-        - id: "0x02"
-          name: Initiate Test Mode
-          dir: send
-          payloadattr:
-            - *testModeDuration
-            - *currentZoneSensitivityLevel
