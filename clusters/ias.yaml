@@ -1,0 +1,153 @@
+---
+name: Security and safety
+description:
+
+templates: {}
+
+types:
+  ZoneState: &zoneState
+    id: '0x0000'
+    name: Zone State
+    type: enum8
+    default: "0x00"
+    required: true
+    values:
+      "0x00": Not Enrolled
+      "0x01": Enrolled
+  ZoneType: &zoneType
+    id: '0x0001'
+    name: Zone Type
+    type: enum16
+    required: true
+    values:
+      "0x0000": Standard CIE
+      "0x000d": Motion sensor
+      "0x0015": Contact Switch
+      "0x0016": Door/Window handle
+      "0x0028": Fire sensor
+      "0x002a": Water sensor
+      "0x002b": Carbon Monoxide sensor
+      "0x002c": Personal emergency device
+      "0x002d": Viburation/Movement sensor
+      "0x010f": Remote control
+      "0x0115": Key fob
+      "0x021d": Key pad
+      "0x0225": Standard warning device
+      "0x0226": Glass break sensor
+      "0x0229": Security repeater
+      "0xffff": Invalid zone type
+  ZoneStatus: &zoneStatus
+    id: '0x0002'
+    name: Zone Status
+    type: bmp16
+    default: "0x00"
+    required: true
+    bits:
+      "0": Alarm1
+      "1": Alarm2
+      "2": Tamper
+      "3": Battery
+      "4": Supervision notify
+      "5": Restore notify
+      "6": Trouble
+      "7": AC (mains)
+      "8": Test
+      "9": Battery defect
+  IasCieAddressMac: &iasCIEAddress
+    id: "0x0010"
+    name: IAS CIE Address (MAC)
+    type: uid
+    access: "rw"
+    required: true
+  ZoneId: &zoneID
+    id: "0x0011"
+    name: Zone ID
+    type: u8
+    range: "0x00,0xff"
+    default: "0xff"
+    required: true
+  NumberOfZoneSensitivityLevelsSupported: &numberOfZoneSensitivityLevelsSupported
+    id: "0x0012"
+    name: Number Of Zone Sensitivity Levels Supported
+    type: u8
+    range: "0x02,0xff"
+    default: "0x02"
+  CurrentZoneSensitivityLevel: &currentZoneSensitivityLevel
+    id: "0x0013"
+    name: Current Zone Sensitivity Level
+    type: u8
+    range: "0x00,0xff"
+    access: "rw"
+    default: "0x00"
+  EnrollResponseCode: &enrollResponseCode
+    name: Enroll response code
+    type: enum8
+    values:
+      "0x00": Success
+      "0x01": Not Supported
+      "0x02": Not permitted
+      "0x03": Too many zones
+  TestModeDuration: &testModeDuration
+    name: Test mode duration
+    type: u8
+    unit: Seconds
+  ExtendedStatus: &extendedStatus
+    name: Extended Status
+    type: bmp8
+  Delay: &delay
+    name: Delay
+    type: u16
+    unit: Seconds
+    multiplier: 4
+  ManufacturerCode: &manufacturerCode
+    name: Manufacturer Code
+    type: u16
+
+clusters:
+  - id: "0x0500"
+    name: IAS Zone
+    description: |
+      provides attributes and commands for controlling IAS security
+      zone devices
+    server:
+      attr:
+        - *zoneState
+        - *zoneType
+        - *zoneStatus
+        - *iasCIEAddress
+        - *zoneID
+        - *numberOfZoneSensitivityLevelsSupported
+        - *currentZoneSensitivityLevel
+      cmd:
+        - id: "0x00"
+          name: Zone State Change Notification
+          dir: send
+          payloadattr:
+            - *zoneStatus
+            - *extendedStatus
+            - *zoneID
+            - *delay
+        - id: "0x01"
+          name: Zone Enroll Request
+          dir: send
+          response: "0x00"
+          payloadattr:
+            - *zoneType
+            - *manufacturerCode
+    client:
+      cmd:
+        - id: "0x00"
+          name: Zone Enroll Response
+          dir: send
+          payloadattr:
+            - *enrollResponseCode
+            - *zoneID
+        - id: "0x01"
+          name: Initiate Normal Operation Mode
+          dir: send
+        - id: "0x02"
+          name: Initiate Test Mode
+          dir: send
+          payloadattr:
+            - *testModeDuration
+            - *currentZoneSensitivityLevel
