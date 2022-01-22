@@ -2,13 +2,13 @@
 manufacturer: &manufacturer
   0x100B: Philips
   0x1021: Legrand
-  0x10F2: Ubisys
-  0x117C: Ikea
-  0x115F: Xiaomi
   0x1037: NXP
-  0x1166: innr
-  0x1241: Samjin
   0x105E: Schneider Electric
+  0x10F2: Ubisys
+  0x115F: Xiaomi
+  0x1166: innr
+  0x117C: Ikea
+  0x1241: Samjin
 
 templates:
   condSuccess: &__cond_success
