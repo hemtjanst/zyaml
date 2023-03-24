@@ -65,7 +65,7 @@ jobs:
       with:
         repository: hemtjanst/zcl
         path: zcl
-        ssh-key: ${{ secrets.BOT_SSH_KEY }}
+        token: ${{ secrets.BOT_GITHUB_TOKEN }}
     - uses: actions/setup-go@v4
       with:
         go-version: 'stable'
