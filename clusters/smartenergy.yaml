@@ -1,0 +1,273 @@
+---
+name: Smart Energy
+templates:
+
+types:
+  # 0x0000 CurrentSummationDelivered uint48 0x000000000000 to 0xFFFFFFFFFFFF R - M
+  CurrentSummationDelivered: &currentSummationDelivered
+    id: "0x0000"
+    name: Current Summation Delivered
+    type: u48
+    required: true
+    report: true
+    description: |
+      represents the most recent summed value of Energy, Gas, or Water delivered and consumed in the premises.
+  # 0x0001 CurrentSummationReceived uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  CurrentSummationReceived: &currentSummationReceived
+    id: "0x0001"
+    name: Current Summation Received
+    type: u48
+    description: |
+      represents the most recent summed value of Energy, Gas, or Water generated and delivered from the premises.
+  # 0x0002 CurrentMaxDemandDelivered uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  CurrentMaxDemandDelivered: &currentMaxDemandDelivered
+    id: "0x0002"
+    name: Current Max Demand Delivered
+    type: u48
+    description: |
+      represents the maximum demand or rate of delivered value of Energy, Gas, or Water being utilized at the premises
+  # 0x0003 CurrentMaxDemandReceived uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  CurrentMaxDemandReceived: &currentMaxDemandReceived
+    id: "0x0003"
+    name: Current Max Demand Received
+    type: u48
+    description: |
+      represents the maximum demand or rate of received value of Energy, Gas, or Water being utilized by the utility
+  # 0x0004 DFTSummation uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  DftSummation: &dftSummation
+    id: "0x0004"
+    name: DFT Summation
+    type: u48
+    description: |
+      represents a snapshot of attribute CurrentSummationDelivered captured at the time indicated by attribute
+      DailyFreezeTime
+  # 0x0005 DailyFreezeTime uint16 0x0000 to 0x183C R 0x0000 O
+  DailyFreezeTime: &dailyFreezeTime
+    id: "0x0005"
+    name: Daily Freeze Time
+    type: u16
+    description: |
+      represents the time of day when DFTSummation.
+      Bits 0 to 7: Range of 0 to 0x3C representing the number of minutes past the top of the hour.
+      Bits 8 to 15: Range of 0 to 0x17 representing the hour of the day (in 24-hour format).
+  # 0x0006 PowerFactor int8 -100 to +100 R 0x00 O
+  PowerFactor: &powerFactor
+    id: "0x0006"
+    name: Power Factor
+    type: s8
+    description: |
+      contains the Average Power Factor ratio in 1/100ths. Valid values are 0 to 99
+  # 0x0007 ReadingSnapShotTime UTC R - O
+  ReadingSnapShotTime: &readingSnapShotTime
+    id: "0x0007"
+    name: Reading Snap Shot Time
+    type: utc
+    description: |
+      represents the last time all of the CurrentSummationDelivered, CurrentSummationReceived,
+      CurrentMaxDemandDelivered, and CurrentMaxDemandReceived attributes that are supported by the device were updated
+  # 0x0008 CurrentMaxDemandDeliveredTime UTC R - O
+  CurrentMaxDemandDeliveredTime: &currentMaxDemandDeliveredTime
+    id: "0x0008"
+    name: Current Max Demand Delivered Time
+    type: utc
+    description: |
+      represents the time when CurrentMaxDemandDelivered reading was captured
+  # 0x0009 CurrentMaxDemandReceivedTime UTC R - O
+  CurrentMaxDemandReceivedTime: &currentMaxDemandReceivedTime
+    id: "0x0009"
+    name: Current Max Demand Received Time
+    type: utc
+    description: |
+      represents the time when CurrentMaxDemandReceived reading was captured
+  # 0x000A DefaultUpdatePeriod uint8 0x00 to 0xFF R 0x1E O
+  DefaultUpdatePeriod: &defaultUpdatePeriod
+    id: "0x000A"
+    name: Default Update Period
+    type: u8
+    default: 0x1E
+    description: |
+      represents the interval (seconds) at which the InstantaneousDemand
+      attribute is updated when not in fast poll mode. InstantaneousDemand may be continuously updated as new
+      measurements are acquired, but at a minimum InstantaneousDemand must be updated at the
+      DefaultUpdatePeriod. The DefaultUpdatePeriod may apply to other attributes as defined by the device
+      manufacturer.
+  # 0x000B FastPollUpdatePeriod uint8 0x00 to 0xFF R 0x05 O
+  FastPollUpdatePeriod: &fastPollUpdatePeriod
+    id: "0x000B"
+    name: Fast Poll Update Period
+    type: u8
+    default: 0x05
+    description: |
+      represents the interval (seconds) at which the InstantaneousDemand
+      attribute is updated when in fast poll mode. InstantaneousDemand may be continuously updated as new
+      measurements are acquired, but at a minimum, InstantaneousDemand must be updated at the
+      FastPollUpdatePeriod. The FastPollUpdatePeriod may apply to other attributes as defined by the device
+      manufacturer.
+  # 0x000C CurrentBlockPeriodConsumptionDelivered uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  CurrentBlockPeriodConsumptionDelivered: &currentBlockPeriodConsumptionDelivered
+    id: "0x000C"
+    name: Current Block Period Consumption Delivered
+    type: u48
+    description: |
+      represents the most recent summed value of Energy, Gas or Water delivered and consumed in the premises during the
+      Block Tariff Period. The CurrentBlockPeriodConsumptionDelivered is reset at the start of each Block Tariff Period.
+  # 0x000D DailyConsumptionTarget uint24 0x000000 to 0xFFFFFF R - O
+  DailyConsumptionTarget: &dailyConsumptionTarget
+    id: "0x000D"
+    name: Daily Consumption Target
+    type: u24
+    description: |
+      is a daily target consumption amount that can be displayed to the consumer on a HAN device, with the intent that
+      it can be used to compare to actual daily consumption (e.g. compare to the CurrentDayConsumptionDelivered).
+      This may be sent from the utility to the ESI, or it may be derived. Although intended to be based on Block
+      Thresholds, it can be used for other targets not related to blocks. The formatting will be based on the
+      HistoricalConsumptionFormatting attribute.
+      Example: If based on a Block Threshold, the DailyConsumptionTarget could be calculated based on the
+      number of days specified in the Block Tariff Period and a given Block Threshold as follows:
+      DailyConsumptionTarget = BlockNThreshold / ((BlockPeriodDuration /60) / 24). Example: If the target is
+      based on a Block1Threshold of 675kWh and where 43200 BlockThresholdPeriod is the number of minutes in
+      the billing period (30 days), the ConsumptionDailyTarget would be 675 / ((43200 / 60) / 24) = 22.5 kWh per day
+  # 0x000E CurrentBlock enum8 0x00 to 0x10 R - O
+  CurrentBlock: &currentBlock
+    id: "0x000E"
+    name: Current Block
+    type: enum8
+    values:
+      "0x00": No blocks in use
+      "0x01": Block1
+      "0x02": Block2
+      "0x03": Block3
+      "0x04": Block4
+      "0x05": Block5
+      "0x06": Block6
+      "0x07": Block7
+      "0x08": Block8
+      "0x09": Block9
+      "0x0A": Block10
+      "0x0B": Block11
+      "0x0C": Block12
+      "0x0D": Block13
+      "0x0E": Block14
+      "0x0F": Block15
+      "0x10": Block16
+    description: |
+      is an 8-bit Enumeration which indicates the currently active block. If blocks are active then the current
+      active block is based on the CurrentBlockPeriodConsumptionDelivered and the block thresholds.
+      Block 1 is active when the value of CurrentBlockPeriodConsumptionDelivered is less than Block1Threshold value;
+      Block 2 is active when CurrentBlockPeriodConsumptionDelivered is greater than Block1Threshold value and less than
+      Block2Threshold value, and so on. Block 16 is active when the value of CurrentBlockPeriodConsumptionDelivered is
+      greater than Block15Threshold value.
+  # 0x000F ProfileIntervalPeriod enum8 0x00 to 0xFF R - O
+  ProfileIntervalPeriod: &profileIntervalPeriod
+    id: "0x000F"
+    name: Profile Interval Period
+    type: enum8
+    description: |
+      is currently included in the Get Profile Response command payload, but does not appear in an attribute set.
+      This represents the duration of each interval. ProfileIntervalPeriod represents the interval or time frame used
+      to capture metered Energy, Gas, and Water consumption for profiling purposes.
+  ### TODO -- the rest
+  # 0x0010 IntervalReadReportingPeriod uint16 0x0000 to 0xFFFF R 0 O
+  IntervalReadReportingPeriod: &intervalReadReportingPeriod
+    id: "0x0010"
+    name: Interval Read Reporting Period
+    type: u16
+  # 0x0011 PresetReadingTime uint16 0x0000 to 0x173B R 0x0000 O
+  PresetReadingTime: &presetReadingTime
+    id: "0x0011"
+    name: Preset Reading Time
+    type: u16
+  # 0x0012 VolumePerReport uint16 0x0000 to 0xFFFF R - O
+  VolumePerReport: &volumePerReport
+    id: "0x0012"
+    name: Volume Per Report
+    type: u16
+  # 0x0013 FlowRestriction uint8 0x00 to 0xFF R - O
+  FlowRestriction: &flowRestriction
+    id: "0x0013"
+    name: Flow Restriction
+    type: u8
+  # 0x0014 Supply Status enum8 0x00 to 0xFF R - O
+  SupplyStatus: &supplyStatus
+    id: "0x0014"
+    name: Supply Status
+    type: enum8
+  # 0x0015 CurrentInletEnergyCarrierSummation uint48 0x000000000000 to 0xFFFFFFFFFFFF R - M*
+  CurrentInletEnergyCarrierSummation: &currentInletEnergyCarrierSummation
+    id: "0x0015"
+    name: Current Inlet Energy Carrier Summation
+    type: u48
+  # 0x0016 CurrentOutletEnergyCarrierSummation uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  CurrentOutletEnergyCarrierSummation: &currentOutletEnergyCarrierSummation
+    id: "0x0016"
+    name: Current Outlet Energy Carrier Summation
+    type: u48
+  # 0x0017 InletTemperature int24 -8,388,607 to 8,388,607 R - M*
+  InletTemperature: &inletTemperature
+    id: "0x0017"
+    name: Inlet Temperature
+    type: s24
+  # 0x0018 OutletTemperature int24 -8,388,607 to 8,388,607 R - M*
+  OutletTemperature: &outletTemperature
+    id: "0x0018"
+    name: Outlet Temperature
+    type: s24
+  # 0x0019 ControlTemperature int24 -8,388,607 to 8,388,607 R - O
+  ControlTemperature: &controlTemperature
+    id: "0x0019"
+    name: Control Temperature
+    type: s24
+  # 0x001A CurrentInletEnergyCarrierDemand int24 -8,388,607 to 8,388,607 R - O
+  CurrentInletEnergyCarrierDemand: &currentInletEnergyCarrierDemand
+    id: "0x001A"
+    name: Current Inlet Energy Carrier Demand
+    type: s24
+  # 0x001B CurrentOutletEnergyCarrierDemand int24 -8,388,607 to 8,388,607 R - O
+  CurrentOutletEnergyCarrierDemand: &currentOutletEnergyCarrierDemand
+    id: "0x001B"
+    name: Current Outlet Energy Carrier Demand
+    type: s24
+  # 0x001C PreviousBlockPeriodConsumptionDelivered uint48 0x000000000000 to 0xFFFFFFFFFFFF R - O
+  PreviousBlockPeriodConsumptionDelivered: &previousBlockPeriodConsumptionDelivered
+    id: "0x001C"
+    name: Previous Block Period Consumption Delivered
+    type: u48
+
+
+clusters:
+  - id: "0x0702"
+    name: Metering
+    description: |
+      provides a mechanism to retrieve usage information from Electric, Gas, Water, and
+      potentially Thermal metering devices.
+    server:
+      attr:
+        - *currentSummationDelivered
+        - *currentSummationReceived
+        - *currentMaxDemandDelivered
+        - *currentMaxDemandReceived
+        - *dftSummation
+        - *dailyFreezeTime
+        - *powerFactor
+        - *readingSnapShotTime
+        - *currentMaxDemandDeliveredTime
+        - *currentMaxDemandReceivedTime
+        - *defaultUpdatePeriod
+        - *fastPollUpdatePeriod
+        - *currentBlockPeriodConsumptionDelivered
+        - *dailyConsumptionTarget
+        - *currentBlock
+        - *profileIntervalPeriod
+        - *intervalReadReportingPeriod
+        - *presetReadingTime
+        - *volumePerReport
+        - *flowRestriction
+        - *supplyStatus
+        - *currentInletEnergyCarrierSummation
+        - *currentOutletEnergyCarrierSummation
+        - *inletTemperature
+        - *outletTemperature
+        - *controlTemperature
+        - *currentInletEnergyCarrierDemand
+        - *currentOutletEnergyCarrierDemand
+        - *previousBlockPeriodConsumptionDelivered

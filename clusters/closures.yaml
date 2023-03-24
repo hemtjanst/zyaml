@@ -158,6 +158,9 @@ types:
     access: rw
     default: 1,0x0000
 clusters:
+  - id: "0x0101"
+    name: Door Lock
+
   - id: "0x0102"
     name: Window Covering
     description: The window covering cluster provides an interface for controlling and
