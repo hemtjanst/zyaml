@@ -16,8 +16,8 @@ jobs:
     name: Lint YAML
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Install YAMLlint
@@ -29,16 +29,17 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: zyaml
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         repository: hemtjanst/zcl
         path: zcl
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v4
       with:
-        go-version: '1.14'
+        go-version: 'stable'
+        check-latest: true
     - name: Run zclgen
       working-directory: ./zcl
       run: |
@@ -57,17 +58,18 @@ jobs:
     needs: generate_and_test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: zyaml
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         repository: hemtjanst/zcl
         path: zcl
         ssh-key: ${{ secrets.BOT_SSH_KEY }}
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v4
       with:
-        go-version: '1.14'
+        go-version: 'stable'
+        check-latest: true
     - name: Run zclgen
       working-directory: ./zcl
       run: |
