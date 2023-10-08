@@ -1346,6 +1346,48 @@ types:
       Measurement Profile Command. Data is organized in a reverse chronological order, the oldest intervals are
       transmitted first and the newest interval is transmitted last. Invalid intervals should be marked as 0xFFFF.
       For scaling and data type use the respective attribute set as defined above in attribute sets.
+  MeasuredConcentration: &measuredConcentration
+    id: "0x0000"
+    name: "Measured Concentration"
+    type: float
+    access: r
+    report: true
+    required: true
+    description: |
+      represents the concentration as a fraction of 1 (one).
+      A value of NaN indicates that the concentration measurement is unknown or outside the valid range.
+      MinMeasuredConcentration and MaxMeasuredConcentration define the valid range for MeasuredConcentration.
+      MeasuredConcentration is updated continuously as new measurements are made
+  MinMeasuredConcentration: &minMeasuredConcentration
+    id: "0x0001"
+    name: "Min Measured Concentration"
+    type: float
+    access: r
+    report: true
+    required: true
+    description: |
+      indicates the minimum value of MeasuredConcentration that is capable of being measured.
+      A value of NaN indicates that the minimum value is not defined
+  MaxMeasuredConcentration: &maxMeasuredConcentration
+    id: "0x0002"
+    name: "Max Measured Concentration"
+    type: float
+    access: r
+    report: true
+    required: true
+    description: |
+      indicates the maximum of MeasuredConcentration that is capable of being measured.
+      A value of NaN indicates that the maximum value is not defined
+  ConcentrationTolerance: &concentrationTolerance
+    id: "0x0003"
+    name: Concentration Tolerance
+    description: |
+      indicates the magnitude of the possible error that is associated with MeasuredValue.
+      The true value is located in the range (MeasuredValue – Tolerance) to
+      (MeasuredValue + Tolerance)
+    type: float
+    access: r
+    required: true
 
 clusters:
   - id: "0x0400"
@@ -1608,3 +1650,48 @@ clusters:
         - *rmsExtremeUnderVoltagePeriodPhC
         - *rmsVoltageSagPeriodPhC
         - *rmsVoltageSwellPeriodPhC
+
+cluster_templates:
+  - values:
+      - { cluster: "0x040c", subst: "Air", key: CarbonMonoxide, name: "Carbon Monoxide", unit: "CO" }
+      - { cluster: "0x040d", subst: "Air", key: CarbonDioxide, name: "Carbon Dioxide", unit: "CO2" }
+      - { cluster: "0x040e", subst: "Air", key: Ethylene, name: "Ethylene", unit: "CH2" }
+      - { cluster: "0x040f", subst: "Air", key: EthyleneOxide, name: "Ethylene Oxide", unit: "C2H40" }
+      - { cluster: "0x0410", subst: "Air", key: Hydrogen, name: "Hydrogen", unit: "H" }
+      - { cluster: "0x0411", subst: "Air", key: HydrogenSulfide, name: "Hydrogen Sulfide", unit: "H2S" }
+      - { cluster: "0x0412", subst: "Air", key: NitricOxide, name: "Nitric Oxide", unit: "NO" }
+      - { cluster: "0x0413", subst: "Air", key: NitrogenDioxide, name: "Nitrogen Dioxide", unit: "NO2" }
+      - { cluster: "0x0414", subst: "Air", key: Oxygen, name: "Oxygen", unit: "O2" }
+      - { cluster: "0x0415", subst: "Air", key: Ozone, name: "Ozone", unit: "O3" }
+      - { cluster: "0x0416", subst: "Air", key: SulfurDioxide, name: "Sulfur Dioxide", unit: "SO2" }
+      - { cluster: "0x0417", subst: "Water", key: DissolvedOxygen, name: "Dissolved Oxygen", unit: "DO" }
+      - { cluster: "0x0418", subst: "Drinking Water", key: Bromate, name: "Bromate", unit: "" }
+      - { cluster: "0x0419", subst: "Drinking Water", key: Chloramines, name: "Chloramines", unit: "" }
+      - { cluster: "0x041a", subst: "Drinking Water", key: Chlorine, name: "Chlorine", unit: "" }
+      - { cluster: "0x041b", subst: "Drinking Water", key: FecalColiformEColi, name: "Fecal coliform & E. Coli", unit: "" }
+      - { cluster: "0x041c", subst: "Drinking Water", key: Fluoride, name: "Fluoride", unit: "" }
+      - { cluster: "0x041d", subst: "Drinking Water", key: HaloaceticAcids, name: "Haloacetic Acids", unit: "" }
+      - { cluster: "0x041e", subst: "Drinking Water", key: TotalTrihalomethanes, name: "Total Trihalomethanes", unit: "" }
+      - { cluster: "0x041f", subst: "Drinking Water", key: TotalColiformBacteria, name: "Total Coliform Bacteria", unit: "" }
+      - { cluster: "0x0420", subst: "Drinking Water", key: Turbidity, name: "Turbidity", unit: "" }
+      - { cluster: "0x0421", subst: "Drinking Water", key: Copper, name: "Copper", unit: "" }
+      - { cluster: "0x0422", subst: "Drinking Water", key: Lead, name: "Lead", unit: "" }
+      - { cluster: "0x0423", subst: "Drinking Water", key: Manganese, name: "Manganese", unit: "" }
+      - { cluster: "0x0424", subst: "Drinking Water", key: Sulfate, name: "Sulfate", unit: "" }
+      - { cluster: "0x0425", subst: "Drinking Water", key: Bromodichloromethane, name: "Bromodichloromethane", unit: "" }
+      - { cluster: "0x0426", subst: "Drinking Water", key: Bromoform, name: "Bromoform", unit: "" }
+      - { cluster: "0x0427", subst: "Drinking Water", key: Chlorodibromomethane, name: "Chlorodibromomethane", unit: "" }
+      - { cluster: "0x0428", subst: "Drinking Water", key: Chloroform, name: "Chloroform", unit: "" }
+      - { cluster: "0x0429", subst: "Drinking Water", key: Sodium, name: "Sodium", unit: "" }
+      - { cluster: "0x042a", subst: "Air", key: Pm25, name: "PM2.5", unit: "" }
+      - { cluster: "0x042b", subst: "Air", key: Formaldehyde, name: "Formaldehyde", unit: "" }
+    cluster_per_value:
+      id: "{{.cluster}}"
+      name: "{{.name}} Measurement"
+      desc: "{{if .unit}}({{.unit}}) {{end}}as concentration in {{.subst}}"
+      server:
+        attr:
+          - *measuredConcentration
+          - *minMeasuredConcentration
+          - *maxMeasuredConcentration
+          - *concentrationTolerance
