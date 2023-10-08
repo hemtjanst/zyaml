@@ -2,10 +2,6 @@
 name: Closures
 description:
 
-templates:
-  position: &position
-    type: u16
-
 types:
   Position: &position
     name: Position

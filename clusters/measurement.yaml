@@ -1353,6 +1353,7 @@ types:
     access: r
     report: true
     required: true
+    unit: Concentration
     description: |
       represents the concentration as a fraction of 1 (one).
       A value of NaN indicates that the concentration measurement is unknown or outside the valid range.
@@ -1365,6 +1366,7 @@ types:
     access: r
     report: true
     required: true
+    unit: Concentration
     description: |
       indicates the minimum value of MeasuredConcentration that is capable of being measured.
       A value of NaN indicates that the minimum value is not defined
@@ -1375,6 +1377,7 @@ types:
     access: r
     report: true
     required: true
+    unit: Concentration
     description: |
       indicates the maximum of MeasuredConcentration that is capable of being measured.
       A value of NaN indicates that the maximum value is not defined
@@ -1388,6 +1391,7 @@ types:
     type: float
     access: r
     required: true
+    unit: Concentration
 
 clusters:
   - id: "0x0400"
@@ -1688,7 +1692,7 @@ cluster_templates:
     cluster_per_value:
       id: "{{.cluster}}"
       name: "{{.name}} Measurement"
-      desc: "{{if .unit}}({{.unit}}) {{end}}as concentration in {{.subst}}"
+      description: "{{if .unit}}({{.unit}}) {{end}}as concentration in {{.subst}}"
       server:
         attr:
           - *measuredConcentration
