@@ -1,0 +1,26 @@
+---
+name: Ikea
+description: |
+  IKEA Specific clusters
+  
+types:
+  VocIndex: &vocIndex
+    id: "0x0000"
+    name: VOC Index
+    type: float
+    access: r
+    report: true
+    description: |
+      represents the Sensirion AG measurement of VOC status relative to the sensors recent history.
+      The VOC Index uses a moving average over the past 24 hours (called the "learning time") as offset.
+      The VOC Index mimics the human nose’s perception of odors with a relative intensity compared to recent history.
+      A VOC Index above 100 means that there are more VOCs compared to the average (e.g., induced by a VOC event from
+      cooking, cleaning, breathing, etc.) while a VOC Index below 100 means that there are fewer VOCs compared to the
+      average (e.g., induced by fresh air from an open window, using an air purifier, etc.).
+      The VOC Index ranges from 1 to 500.
+clusters:
+  - id: "0xFC7E"
+    name: IKEA Air Quality
+    server:
+      attr:
+        - *vocIndex

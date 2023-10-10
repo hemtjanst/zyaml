@@ -1392,6 +1392,37 @@ types:
     access: r
     required: true
     unit: Concentration
+  MeasuredPm25: &measuredPm25
+    id: "0x0000"
+    name: "Measured PM2.5"
+    type: float
+    access: r
+    report: true
+    required: true
+    unit: MicrogramPerCubicMeter
+  MinMeasuredPm25: &minMeasuredPm25
+    id: "0x0001"
+    name: "Min Measured PM2.5"
+    type: float
+    access: r
+    report: true
+    required: true
+    unit: MicrogramPerCubicMeter
+  MaxMeasuredPm25: &maxMeasuredPm25
+    id: "0x0002"
+    name: "Max Measured PM2.5"
+    type: float
+    access: r
+    report: true
+    required: true
+    unit: MicrogramPerCubicMeter
+  Pm25Tolerance: &pm25Tolerance
+    id: "0x0003"
+    name: PM2.5 Tolerance
+    type: float
+    access: r
+    required: true
+    unit: MicrogramPerCubicMeter
 
 clusters:
   - id: "0x0400"
@@ -1481,6 +1512,17 @@ clusters:
         - *ultrasonicOccupiedToUnoccupiedDelay
         - *ultrasonicUnoccupiedToOccupiedDelay
         - *ultrasonicUnoccupiedToOccupiedThreshold
+
+  - id: "0x042a"
+    name: PM2.5 Measurement
+    description: "(Particulate Matter 2.5 microns or less) in µg/m³"
+    server:
+      attr:
+        - *measuredPm25
+        - *minMeasuredPm25
+        - *maxMeasuredPm25
+        - *pm25Tolerance
+
 
   - id: "0x0B04"
     name: Electrical Measurement
@@ -1687,7 +1729,6 @@ cluster_templates:
       - {cluster: "0x0427", subst: "Drinking Water", key: Chlorodibromomethane, name: "Chlorodibromomethane"}
       - {cluster: "0x0428", subst: "Drinking Water", key: Chloroform, name: "Chloroform"}
       - {cluster: "0x0429", subst: "Drinking Water", key: Sodium, name: "Sodium"}
-      - {cluster: "0x042a", subst: "Air", key: Pm25, name: "PM2.5"}
       - {cluster: "0x042b", subst: "Air", key: Formaldehyde, name: "Formaldehyde"}
     cluster_per_value:
       id: "{{.cluster}}"
