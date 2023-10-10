@@ -2,7 +2,7 @@
 name: Ikea
 description: |
   IKEA Specific clusters
-  
+
 types:
   VocIndex: &vocIndex
     id: "0x0000"
